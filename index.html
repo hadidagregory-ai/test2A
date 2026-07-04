@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="theme-color" content="#0F0F0F"/>
+<title>TrainingJudo — Bilan Neuro-Athlétique</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#7ED957;--orange:#FFBD59;--red:#FF5757;
+  --bg:#0F0F0F;--card:#1A1A1A;--border:#2A2A2A;
+  --white:#F5F5F5;--gray:#9CA3AF;--dim:#4B5563;
+  --font:system-ui,-apple-system,sans-serif;
+  --safe-b:env(safe-area-inset-bottom,0px);
+  --safe-t:env(safe-area-inset-top,0px);
+}
+html,body{min-height:100%;background:var(--bg);color:var(--white);font-family:var(--font);overflow-x:hidden;-webkit-text-size-adjust:100%}
+*{-webkit-tap-highlight-color:transparent}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+
+.page{
+  max-width:520px;margin:0 auto;
+  padding:calc(var(--safe-t) + 40px) 20px calc(var(--safe-b) + 40px);
+  animation:fadeUp .4s ease;
+}
+
+/* HEADER */
+.brand{text-align:center;margin-bottom:48px}
+.brand-logo{
+  display:inline-flex;align-items:center;gap:10px;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:16px;padding:12px 20px;margin-bottom:24px;
+}
+.brand-logo-icon{
+  width:36px;height:36px;background:var(--green);border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;font-weight:900;color:#000;
+}
+.brand-name{font-size:17px;font-weight:900;letter-spacing:.04em}
+.brand-name span{color:var(--green)}
+.brand-title{font-size:28px;font-weight:900;line-height:1.2;margin-bottom:8px}
+.brand-title em{font-style:normal;color:var(--green)}
+.brand-sub{font-size:14px;color:var(--gray);line-height:1.6}
+
+/* CARDS */
+.card-link{
+  display:block;text-decoration:none;color:inherit;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:18px;padding:24px;margin-bottom:14px;
+  transition:border-color .15s,transform .1s;
+  position:relative;overflow:hidden;
+}
+.card-link:active{transform:scale(0.985)}
+.card-link::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  border-radius:99px;
+}
+.card-green::before{background:var(--green)}
+.card-orange::before{background:var(--orange)}
+.card-red::before{background:var(--red)}
+
+.card-icon{
+  width:52px;height:52px;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:26px;margin-bottom:16px;
+}
+.card-green .card-icon{background:#7ED95720}
+.card-orange .card-icon{background:#FFBD5920}
+.card-red .card-icon{background:#FF575720}
+
+.card-label{font-size:11px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;margin-bottom:6px}
+.card-green .card-label{color:var(--green)}
+.card-orange .card-label{color:var(--orange)}
+.card-red .card-label{color:var(--red)}
+
+.card-title{font-size:20px;font-weight:900;margin-bottom:6px;line-height:1.2}
+.card-desc{font-size:13px;color:var(--gray);line-height:1.6;margin-bottom:16px}
+.card-tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{
+  font-size:11px;font-weight:700;padding:4px 10px;border-radius:99px;
+  background:var(--bg);border:1px solid var(--border);color:var(--gray);
+}
+
+.card-arrow{
+  position:absolute;top:24px;right:20px;
+  font-size:20px;color:var(--dim);
+}
+
+/* FOOTER */
+.footer{text-align:center;margin-top:32px;padding-top:24px;border-top:1px solid var(--border)}
+.footer-text{font-size:12px;color:var(--dim)}
+.footer-text span{color:var(--green);font-weight:700}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Brand -->
+  <div class="brand">
+    <div class="brand-logo">
+      <div class="brand-logo-icon">TJ</div>
+      <div class="brand-name">Training<span>Judo</span></div>
+    </div>
+    <h1 class="brand-title">Bilan<br><em>Neuro-Athlétique</em></h1>
+    <p class="brand-sub">Évaluation complète du judoka —<br>force, vitesse, puissance, neuro, mobilité.</p>
+  </div>
+
+  <!-- Card 1 — Bilan complet -->
+  <a href="bilan.html" class="card-link card-green">
+    <div class="card-arrow">→</div>
+    <div class="card-icon">📋</div>
+    <div class="card-label">Évaluation principale</div>
+    <h2 class="card-title">Bilan Neuro-Athlétique</h2>
+    <p class="card-desc">6 séances structurées. Entre tes résultats et vois ton profil complet : radar des piliers, profil Force-Vitesse, lecture croisée automatique.</p>
+    <div class="card-tags">
+      <span class="tag">6 séances</span>
+      <span class="tag">Force · Vitesse · Puissance</span>
+      <span class="tag">Neuro · Cardio</span>
+      <span class="tag">Profil F-V Samozino</span>
+    </div>
+  </a>
+
+  <!-- Card 2 — Outils avancés -->
+  <a href="outils.html" class="card-link card-orange">
+    <div class="card-arrow">→</div>
+    <div class="card-icon">🔬</div>
+    <div class="card-label">Mesures instrumentées</div>
+    <h2 class="card-title">Outils Avancés</h2>
+    <p class="card-desc">Analyse vidéo frame par frame. Mesures en temps réel depuis la caméra et les capteurs du téléphone.</p>
+    <div class="card-tags">
+      <span class="tag">Inclinomètre 11 mouvements</span>
+      <span class="tag">CMJ · RSI · Saut horizontal</span>
+      <span class="tag">VBT vidéo</span>
+      <span class="tag">Sprint · Profil F-V</span>
+    </div>
+  </a>
+
+  <!-- Footer -->
+  <div class="footer">
+    <p class="footer-text">Par <span>TrainingJudo</span> · Coaching neuro-athlétique judo</p>
+  </div>
+
+</div>
+</body>
+</html>

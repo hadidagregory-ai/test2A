@@ -1,0 +1,1897 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="theme-color" content="#0F0F0F"/>
+<title>Outils Avancés — TrainingJudo</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#7ED957;--orange:#FFBD59;--red:#FF5757;--gray:#9CA3AF;
+  --bg:#0F0F0F;--card:#1A1A1A;--card2:#222;--border:#2A2A2A;
+  --white:#F5F5F5;--dim:#4B5563;
+  --radius:14px;--font:system-ui,-apple-system,sans-serif;
+  --nav-h:64px;--safe-b:env(safe-area-inset-bottom,0px);
+  --safe-t:env(safe-area-inset-top,0px);
+}
+html{height:100%;overflow-x:hidden;-webkit-text-size-adjust:100%}
+body{
+  font-family:var(--font);background:var(--bg);color:var(--white);
+  min-height:100vh;font-size:15px;line-height:1.5;
+  overflow-x:hidden;-webkit-overflow-scrolling:touch;
+}
+*{-webkit-tap-highlight-color:transparent}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+@keyframes countdown{0%{transform:scale(1.2);opacity:1}100%{transform:scale(0.8);opacity:0}}
+
+/* VIEWS */
+.view{display:none;animation:fadeIn .25s ease}
+.view.active{display:block}
+
+/* HEADER */
+.app-header{
+  position:sticky;top:0;z-index:300;
+  background:rgba(15,15,15,0.97);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  height:56px;display:flex;align-items:center;padding:0 20px;
+}
+.header-inner{
+  width:100%;max-width:680px;margin:0 auto;
+  display:flex;align-items:center;gap:12px;
+}
+.logo{font-size:15px;font-weight:900;letter-spacing:.06em;color:var(--white);flex:1}
+.logo span{color:var(--green)}
+
+/* BOTTOM NAV */
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;z-index:300;
+  background:rgba(15,15,15,0.97);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-top:1px solid var(--border);
+  display:flex;
+  padding-bottom:var(--safe-b);
+}
+.nav-items{display:flex;width:100%;max-width:680px;margin:0 auto}
+.nav-item{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  gap:3px;padding:10px 4px 8px;cursor:pointer;
+  border:none;background:none;color:var(--dim);
+  font-family:var(--font);font-size:10px;font-weight:700;
+  letter-spacing:.04em;touch-action:manipulation;transition:color .15s;
+  min-height:44px;
+}
+.nav-item.active{color:var(--green)}
+.nav-item svg{width:22px;height:22px;stroke-width:2}
+
+/* PAGE */
+.page{max-width:680px;margin:0 auto;padding:20px 16px;padding-bottom:calc(var(--nav-h) + var(--safe-b) + 20px)}
+
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.card-sm{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px}
+
+/* TYPOGRAPHY */
+h2{font-size:20px;font-weight:800;margin-bottom:8px}
+h3{font-size:16px;font-weight:700;margin-bottom:8px}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--green);text-transform:uppercase;margin-bottom:4px}
+.subtext{font-size:13px;color:var(--gray);line-height:1.6}
+.label{font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.mb-4{margin-bottom:4px}
+.mb-8{margin-bottom:8px}
+.mb-12{margin-bottom:12px}
+.mb-16{margin-bottom:16px}
+.mb-20{margin-bottom:20px}
+
+/* BUTTONS */
+.btn{
+  display:block;width:100%;padding:14px 20px;border-radius:12px;
+  border:none;font-family:var(--font);font-size:16px;font-weight:700;
+  cursor:pointer;touch-action:manipulation;min-height:44px;
+  transition:opacity .15s,transform .1s;text-align:center;
+}
+.btn:active{transform:scale(.97);opacity:.85}
+.btn-primary{background:var(--green);color:#000}
+.btn-orange{background:var(--orange);color:#000}
+.btn-red{background:var(--red);color:#fff}
+.btn-ghost{background:var(--card2);color:var(--white);border:1px solid var(--border)}
+.btn-sm{padding:10px 16px;font-size:14px;min-height:40px;border-radius:10px}
+.btn-icon{width:48px;height:48px;padding:0;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.btn-disabled{opacity:.4;pointer-events:none}
+
+/* INPUTS */
+input[type=text],input[type=number],select,textarea{
+  background:var(--card2);border:1px solid var(--border);border-radius:10px;
+  color:var(--white);font-family:var(--font);font-size:16px;
+  padding:12px 14px;width:100%;outline:none;
+  -webkit-appearance:none;appearance:none;
+}
+input:focus,select:focus{border-color:var(--green)}
+select option{background:#1A1A1A}
+
+/* GRID */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+
+/* METRIC BOXES */
+.metric-box{background:#111;border-radius:12px;padding:14px;text-align:center}
+.metric-val{font-size:32px;font-weight:900;line-height:1;font-variant-numeric:tabular-nums}
+.metric-unit{font-size:11px;color:var(--gray);margin-top:3px}
+.metric-label{font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+
+/* BADGE */
+.badge{display:inline-block;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700}
+.badge-green{background:#7ED95722;color:var(--green);border:1px solid #7ED95740}
+.badge-orange{background:#FFBD5922;color:var(--orange);border:1px solid #FFBD5940}
+.badge-red{background:#FF575722;color:var(--red);border:1px solid #FF575740}
+
+/* TABS (sub) */
+.sub-tabs{display:flex;gap:6px;margin-bottom:16px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.sub-tabs::-webkit-scrollbar{display:none}
+.sub-tab{
+  flex-shrink:0;padding:8px 16px;border-radius:20px;font-size:13px;font-weight:700;
+  border:1px solid var(--border);background:var(--card2);color:var(--gray);
+  cursor:pointer;touch-action:manipulation;white-space:nowrap;min-height:36px;
+}
+.sub-tab.active{background:var(--green);color:#000;border-color:var(--green)}
+
+/* TOGGLE */
+.toggle-row{display:flex;background:var(--card2);border-radius:10px;border:1px solid var(--border);overflow:hidden}
+.toggle-btn{flex:1;padding:10px;font-size:14px;font-weight:700;border:none;background:none;color:var(--gray);cursor:pointer;touch-action:manipulation;min-height:44px;font-family:var(--font)}
+.toggle-btn.active{background:var(--green);color:#000}
+
+/* MOVEMENT GRID */
+.mvt-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mvt-btn{
+  background:var(--card2);border:1px solid var(--border);border-radius:10px;
+  padding:10px 8px;cursor:pointer;touch-action:manipulation;
+  font-family:var(--font);color:var(--white);text-align:center;
+  font-size:12px;font-weight:700;line-height:1.3;min-height:56px;
+  transition:all .15s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+}
+.mvt-btn.active{background:#7ED95720;border-color:var(--green);color:var(--green)}
+.mvt-btn span{font-size:20px}
+
+/* BIG ANGLE DISPLAY */
+.angle-big{
+  font-size:80px;font-weight:900;line-height:1;font-variant-numeric:tabular-nums;
+  text-align:center;padding:20px 0 10px;
+}
+.countdown-big{
+  font-size:96px;font-weight:900;line-height:1;text-align:center;
+  color:var(--green);padding:20px 0;
+  animation:countdown .9s ease-out;
+}
+
+/* HISTORY CHIPS */
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{
+  padding:6px 12px;border-radius:20px;font-size:12px;font-weight:700;
+  background:var(--card2);border:1px solid var(--border);
+  display:flex;align-items:center;gap:5px;
+}
+.chip-green{border-color:#7ED95740;color:var(--green)}
+.chip-orange{border-color:#FFBD5940;color:var(--orange)}
+.chip-red{border-color:#FF575740;color:var(--red)}
+
+/* VIDEO/CANVAS WRAPPER */
+.video-wrapper{
+  width:100%;background:#111;border-radius:12px;overflow:hidden;
+  position:relative;margin-bottom:12px;
+}
+.tool-canvas{width:100%;display:block;border-radius:12px;touch-action:none}
+
+/* FRAME CONTROLS */
+.frame-controls{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.frame-btn{
+  width:48px;height:48px;border-radius:10px;font-size:20px;font-weight:900;
+  border:1px solid var(--border);background:var(--card2);color:var(--white);
+  cursor:pointer;touch-action:manipulation;display:flex;align-items:center;justify-content:center;
+}
+.frame-display{flex:1;text-align:center;font-size:13px;color:var(--gray);background:#111;border-radius:8px;padding:8px}
+
+/* RESULT ROWS */
+.result-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)}
+.result-row:last-child{border-bottom:none}
+
+/* CHART CONTAINER */
+.chart-wrap{background:#111;border-radius:12px;padding:12px;margin-bottom:12px;position:relative}
+
+/* TRACKING INDICATOR */
+.track-dot{
+  width:20px;height:20px;border-radius:50%;border:3px solid var(--green);
+  position:absolute;pointer-events:none;transform:translate(-50%,-50%);
+  box-shadow:0 0 8px rgba(126,217,87,0.6);
+}
+
+/* WARN BOX */
+.warn-box{background:#FFBD5910;border:1px solid #FFBD5940;border-radius:10px;padding:12px;font-size:12px;color:var(--orange);margin-bottom:12px;line-height:1.5}
+.info-box{background:#7ED95710;border:1px solid #7ED95740;border-radius:10px;padding:12px;font-size:12px;color:var(--green);margin-bottom:12px;line-height:1.5}
+
+/* INTERPRETATION BOX */
+.interp-box{border-radius:10px;padding:14px;margin-top:12px;font-size:14px;font-weight:600;text-align:center;line-height:1.5}
+.interp-green{background:#7ED95715;border:1px solid #7ED95740;color:var(--green)}
+.interp-orange{background:#FFBD5915;border:1px solid #FFBD5940;color:var(--orange)}
+.interp-red{background:#FF575715;border:1px solid #FF575740;color:var(--red)}
+
+/* STEP INPUT ROWS */
+.step-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.step-num{width:28px;height:28px;border-radius:50%;background:var(--card2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.step-num.done{background:var(--green);color:#000;border-color:var(--green)}
+
+/* LOADING */
+.loading{display:flex;align-items:center;justify-content:center;gap:10px;padding:24px;color:var(--gray);font-size:14px}
+.spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite}
+
+/* SCROLL FIX */
+.scroll-area{overflow-y:auto;-webkit-overflow-scrolling:touch}
+
+/* HIDE */
+.hidden{display:none!important}
+
+/* FPS SELECTOR */
+.fps-row{display:flex;gap:6px;align-items:center;margin-bottom:12px}
+.fps-label{font-size:12px;color:var(--gray);flex-shrink:0}
+.fps-opt{padding:6px 12px;border-radius:8px;font-size:13px;font-weight:700;border:1px solid var(--border);background:var(--card2);color:var(--gray);cursor:pointer;touch-action:manipulation}
+.fps-opt.active{background:var(--orange);color:#000;border-color:var(--orange)}
+
+/* CALIBRATION LINE */
+.calib-hint{font-size:12px;color:var(--gray);text-align:center;margin-top:6px}
+
+/* REP MARKER GRID */
+.rep-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin-bottom:12px}
+.rep-cell{height:24px;border-radius:4px;border:1px solid var(--border);background:var(--card2);font-size:10px;display:flex;align-items:center;justify-content:center}
+.rep-cell.take{background:#7ED95740;border-color:var(--green);color:var(--green)}
+.rep-cell.land{background:#FFBD5940;border-color:var(--orange);color:var(--orange)}
+.rep-cell.active{border-color:var(--white);animation:pulse 1s infinite}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="app-header">
+  <div class="header-inner">
+    <div class="logo">TRAINING<span>JUDO</span></div>
+    <div style="font-size:12px;color:var(--gray);font-weight:700">Outils Avancés</div>
+  </div>
+</header>
+
+<!-- VIEWS -->
+
+<!-- ═══════════════════ INCLINOMÈTRE ═══════════════════ -->
+<div class="view active" id="view-incl">
+<div class="page">
+  <div class="eyebrow">OUTIL 1</div>
+  <h2>Inclinomètre Pro</h2>
+  <p class="subtext mb-16">Mesure de mobilité articulaire avec le gyroscope de ton téléphone.</p>
+
+  <!-- Movement selection -->
+  <div class="card mb-12">
+    <div class="label mb-8">Sélectionne le mouvement</div>
+    <div class="mvt-grid" id="mvt-grid"></div>
+  </div>
+
+  <!-- Selected movement info -->
+  <div id="mvt-info" class="info-box hidden mb-12"></div>
+
+  <!-- Side toggle -->
+  <div class="card mb-12">
+    <div class="label mb-8">Côté</div>
+    <div class="toggle-row">
+      <button class="toggle-btn active" id="side-droit" onclick="setSide('Droit')" touch-action="manipulation">Droit</button>
+      <button class="toggle-btn" id="side-gauche" onclick="setSide('Gauche')" touch-action="manipulation">Gauche</button>
+    </div>
+  </div>
+
+  <!-- Live display -->
+  <div class="card mb-12" style="text-align:center">
+    <div class="label mb-4">Angle en direct</div>
+    <div id="incl-live" class="angle-big" style="color:var(--gray)">—°</div>
+    <div id="incl-countdown-display" style="font-size:64px;font-weight:900;color:var(--orange);min-height:80px;display:flex;align-items:center;justify-content:center" class="hidden"></div>
+    <div id="incl-status" class="subtext" style="margin-top:4px">Sélectionne un mouvement puis démarre</div>
+
+    <div id="incl-result-box" class="hidden" style="margin-top:12px">
+      <div id="incl-captured-val" style="font-size:48px;font-weight:900;line-height:1;font-variant-numeric:tabular-nums">0°</div>
+      <div id="incl-interp" class="interp-box" style="margin-top:8px"></div>
+    </div>
+  </div>
+
+  <!-- Calib + Start -->
+  <div class="grid-2 mb-12">
+    <button class="btn btn-ghost" onclick="inclCalibrate()" touch-action="manipulation">Calibrer = 0°</button>
+    <button class="btn btn-primary" id="incl-start-btn" onclick="inclStart()" touch-action="manipulation">Démarrer</button>
+  </div>
+  <button id="incl-stop-btn" class="btn btn-ghost hidden mb-12" onclick="inclStop()" touch-action="manipulation">Arrêter</button>
+
+  <!-- History -->
+  <div class="card">
+    <div class="label mb-8">Dernières mesures</div>
+    <div id="incl-history" class="chips"><span style="color:var(--dim);font-size:13px">Aucune mesure</span></div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════ SAUTS ═══════════════════ -->
+<div class="view" id="view-sauts">
+<div class="page">
+  <div class="eyebrow">OUTIL 2</div>
+  <h2>Analyse Sauts Vidéo</h2>
+  <p class="subtext mb-16">Analyse frame par frame depuis une vidéo au ralenti.</p>
+
+  <div class="warn-box">⚠️ La précision dépend du FPS réel de la vidéo. Vérifie dans les infos du fichier vidéo. Utilise de préférence 120fps ou 240fps.</div>
+
+  <!-- Sub-tabs -->
+  <div class="sub-tabs" id="jump-subtabs">
+    <div class="sub-tab active" onclick="setJumpMode('cmj')">CMJ</div>
+    <div class="sub-tab" onclick="setJumpMode('sj')">Squat Jump</div>
+    <div class="sub-tab" onclick="setJumpMode('rsi')">RSI 10 Sauts</div>
+    <div class="sub-tab" onclick="setJumpMode('horiz')">Saut Horizontal</div>
+  </div>
+
+  <!-- Video loader -->
+  <div id="jump-video-loader" class="card mb-12" style="text-align:center">
+    <div style="font-size:40px;margin-bottom:8px">🎬</div>
+    <div style="font-weight:700;margin-bottom:6px">Charger une vidéo</div>
+    <p class="subtext mb-12">Vidéo filmée de côté. Recommandé: ralenti 120/240fps.</p>
+    <label class="btn btn-primary" style="cursor:pointer;text-decoration:none">
+      Choisir une vidéo
+      <input type="file" accept="video/*" style="display:none" onchange="jumpLoadVideo(event)">
+    </label>
+  </div>
+
+  <!-- FPS selector (shown after video load) -->
+  <div id="jump-fps-row" class="hidden card mb-12">
+    <div class="label mb-8">FPS de la vidéo</div>
+    <div class="fps-row" id="fps-btns" style="flex-wrap:wrap">
+      <span class="fps-label">Fréquence :</span>
+      <button class="fps-opt" onclick="setJumpFPS(30)">30 fps</button>
+      <button class="fps-opt active" onclick="setJumpFPS(60)">60 fps</button>
+      <button class="fps-opt" onclick="setJumpFPS(120)">120 fps</button>
+      <button class="fps-opt" onclick="setJumpFPS(240)">240 fps</button>
+    </div>
+  </div>
+
+  <!-- Video + canvas -->
+  <div id="jump-video-area" class="hidden">
+    <video id="jump-video" playsinline webkit-playsinline muted style="display:none" preload="metadata"></video>
+    <div class="video-wrapper">
+      <canvas id="jump-canvas" class="tool-canvas" style="cursor:crosshair"></canvas>
+    </div>
+
+    <!-- Frame scrubber -->
+    <div class="frame-controls mb-12">
+      <button class="frame-btn" onclick="jumpSeek(-1)" touch-action="manipulation">‹</button>
+      <button class="frame-btn" onclick="jumpSeek(-10)" touch-action="manipulation" style="font-size:14px">‹‹</button>
+      <div class="frame-display" id="jump-frame-display">Frame 0</div>
+      <button class="frame-btn" onclick="jumpSeek(10)" touch-action="manipulation" style="font-size:14px">››</button>
+      <button class="frame-btn" onclick="jumpSeek(1)" touch-action="manipulation">›</button>
+    </div>
+
+    <!-- Mode-specific controls -->
+    <div id="jump-cmj-ctrl">
+      <div class="grid-2 mb-12">
+        <button class="btn btn-ghost" id="jump-take-btn" onclick="jumpMarkTakeoff()" touch-action="manipulation">🛫 Décollage</button>
+        <button class="btn btn-ghost" id="jump-land-btn" onclick="jumpMarkLanding()" touch-action="manipulation">🛬 Atterrissage</button>
+      </div>
+      <div id="jump-times" class="card-sm mb-12 hidden">
+        <div class="grid-2">
+          <div><div class="label">Décollage</div><div id="jump-take-val" style="font-size:14px;font-weight:700">—</div></div>
+          <div><div class="label">Atterrissage</div><div id="jump-land-val" style="font-size:14px;font-weight:700">—</div></div>
+        </div>
+      </div>
+      <div id="jump-result" class="hidden">
+        <div class="grid-2 mb-12">
+          <div class="metric-box"><div class="metric-label">Vol</div><div class="metric-val" id="jump-flightms" style="font-size:24px;color:var(--orange)">—</div><div class="metric-unit">ms</div></div>
+          <div class="metric-box"><div class="metric-label">Hauteur</div><div class="metric-val" id="jump-height" style="font-size:36px;color:var(--green)">—</div><div class="metric-unit">cm</div></div>
+        </div>
+        <div id="jump-level-badge" style="text-align:center;margin-bottom:12px"></div>
+        <div id="jump-interp" class="interp-box"></div>
+        <button class="btn btn-primary mt-12" style="margin-top:12px" onclick="jumpSave()" touch-action="manipulation">Enregistrer</button>
+      </div>
+    </div>
+
+    <!-- RSI controls -->
+    <div id="jump-rsi-ctrl" class="hidden">
+      <div class="card-sm mb-12">
+        <div class="label mb-8">Progression des marqueurs</div>
+        <div class="rep-grid" id="rsi-rep-grid"></div>
+        <div id="rsi-next-label" style="font-size:13px;color:var(--orange);font-weight:700;margin-top:8px;text-align:center">Marque le Décollage 1</div>
+      </div>
+      <button class="btn btn-primary mb-12" onclick="rsiMarkFrame()" touch-action="manipulation" id="rsi-mark-btn">🏃 Marquer ce frame</button>
+      <div id="rsi-results" class="hidden"></div>
+    </div>
+
+    <!-- Horizontal jump controls -->
+    <div id="jump-horiz-ctrl" class="hidden">
+      <div class="card-sm mb-12" id="horiz-calib-box">
+        <div class="label mb-4">Étalonnage (obligatoire)</div>
+        <p class="subtext mb-8">Tape 2 points sur la vidéo = une distance connue (ex: règle au sol).</p>
+        <div class="grid-2 mb-8">
+          <div><div class="label mb-4">Point A</div><div id="calib-a-val" style="font-size:13px;font-weight:700;color:var(--gray)">Non défini</div></div>
+          <div><div class="label mb-4">Point B</div><div id="calib-b-val" style="font-size:13px;font-weight:700;color:var(--gray)">Non défini</div></div>
+        </div>
+        <input type="number" id="calib-real-dist" placeholder="Distance réelle (cm)" style="margin-bottom:8px">
+        <button class="btn btn-orange" onclick="horizValidateCalib()" touch-action="manipulation">Valider l'étalonnage</button>
+      </div>
+      <div id="horiz-marks-box" class="hidden">
+        <div class="grid-2 mb-12">
+          <button class="btn btn-ghost" onclick="horizMarkTakeoff()" touch-action="manipulation">🛫 Décollage</button>
+          <button class="btn btn-ghost" onclick="horizMarkLanding()" touch-action="manipulation">📍 Réception</button>
+        </div>
+        <div id="horiz-result" class="hidden metric-box mt-12">
+          <div class="metric-label">Distance horizontale</div>
+          <div class="metric-val" id="horiz-dist-val" style="color:var(--green)">—</div>
+          <div class="metric-unit">cm</div>
+          <button class="btn btn-primary" style="margin-top:12px" onclick="horizSave()" touch-action="manipulation">Enregistrer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- History -->
+  <div class="card" id="jump-history-card">
+    <div class="label mb-8">Derniers résultats</div>
+    <div id="jump-history"></div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════ VBT VIDÉO ═══════════════════ -->
+<div class="view" id="view-vbt">
+<div class="page">
+  <div class="eyebrow">OUTIL 3</div>
+  <h2>VBT Vidéo</h2>
+  <p class="subtext mb-16">Suivi de barre par analyse vidéo — calcul de vitesse et puissance.</p>
+
+  <div class="warn-box">⚠️ FPS : plus le FPS est élevé, plus la précision est grande. Vérifie le FPS réel dans les infos vidéo.</div>
+
+  <!-- Step 1: Load video -->
+  <div id="vbt-step1" class="card mb-12">
+    <div class="label mb-8">1. Charger la vidéo</div>
+    <label class="btn btn-primary" style="cursor:pointer">
+      Choisir une vidéo
+      <input type="file" accept="video/*" style="display:none" onchange="vbtLoadVideo(event)">
+    </label>
+  </div>
+
+  <!-- Step 2: FPS + params -->
+  <div id="vbt-step2" class="card mb-12 hidden">
+    <div class="label mb-8">2. Paramètres</div>
+    <div class="fps-row mb-12" style="flex-wrap:wrap" id="vbt-fps-btns">
+      <span class="fps-label">FPS :</span>
+      <button class="fps-opt" onclick="setVbtFPS(30)">30</button>
+      <button class="fps-opt active" onclick="setVbtFPS(60)">60</button>
+      <button class="fps-opt" onclick="setVbtFPS(120)">120</button>
+      <button class="fps-opt" onclick="setVbtFPS(240)">240</button>
+    </div>
+    <div class="grid-2 mb-8">
+      <div><div class="label mb-4">Charge (kg)</div><input type="number" id="vbt-load" placeholder="ex: 80" min="0" step="0.5"></div>
+      <div><div class="label mb-4">Poids corps (kg)</div><input type="number" id="vbt-bw" placeholder="ex: 75" min="0" step="0.5"></div>
+    </div>
+  </div>
+
+  <!-- Video + canvas -->
+  <div id="vbt-video-area" class="hidden">
+    <video id="vbt-video" playsinline webkit-playsinline muted style="display:none" preload="metadata"></video>
+    <div class="video-wrapper" style="position:relative">
+      <canvas id="vbt-canvas" class="tool-canvas" style="cursor:crosshair"></canvas>
+      <div id="vbt-track-dot" class="track-dot hidden"></div>
+    </div>
+
+    <!-- Frame controls -->
+    <div class="frame-controls mb-12">
+      <button class="frame-btn" onclick="vbtSeek(-1)" touch-action="manipulation">‹</button>
+      <button class="frame-btn" onclick="vbtSeek(-5)" touch-action="manipulation" style="font-size:14px">‹‹</button>
+      <div class="frame-display" id="vbt-frame-display">Frame 0</div>
+      <button class="frame-btn" onclick="vbtSeek(5)" touch-action="manipulation" style="font-size:14px">››</button>
+      <button class="frame-btn" onclick="vbtSeek(1)" touch-action="manipulation">›</button>
+    </div>
+
+    <!-- Step 3: Calibration -->
+    <div id="vbt-step3" class="card mb-12">
+      <div class="label mb-4">3. Étalonnage</div>
+      <p class="subtext mb-8">Tape 2 points sur le premier frame = une distance connue (ex: plaque de 45cm).</p>
+      <div class="grid-2 mb-8">
+        <div><div class="label mb-4">Point A</div><div id="vbt-calib-a" style="font-size:12px;color:var(--gray)">Non défini</div></div>
+        <div><div class="label mb-4">Point B</div><div id="vbt-calib-b" style="font-size:12px;color:var(--gray)">Non défini</div></div>
+      </div>
+      <input type="number" id="vbt-calib-dist" placeholder="Distance réelle (cm)" style="margin-bottom:8px">
+      <button class="btn btn-orange" onclick="vbtValidateCalib()" touch-action="manipulation">Valider l'étalonnage</button>
+    </div>
+
+    <!-- Step 4: Mark bar -->
+    <div id="vbt-step4" class="card mb-12 hidden">
+      <div class="label mb-4">4. Marquer la barre</div>
+      <p class="subtext mb-8">Tape sur la plaque de la barre pour définir le point de suivi.</p>
+      <div id="vbt-bar-pos" style="font-size:12px;color:var(--gray);margin-bottom:8px">Non défini</div>
+      <div class="grid-2">
+        <button class="btn btn-primary" onclick="vbtStartTracking()" touch-action="manipulation" id="vbt-track-btn">Analyser toute la vidéo</button>
+        <button class="btn btn-ghost" onclick="vbtResetBar()" touch-action="manipulation">Réinitialiser</button>
+      </div>
+      <div id="vbt-track-progress" class="hidden" style="margin-top:12px">
+        <div style="background:var(--border);border-radius:4px;height:4px;overflow:hidden">
+          <div id="vbt-prog-bar" style="background:var(--green);height:100%;width:0%;transition:width .1s"></div>
+        </div>
+        <div id="vbt-prog-label" style="font-size:12px;color:var(--gray);text-align:center;margin-top:6px">Analyse en cours…</div>
+      </div>
+    </div>
+
+    <!-- Results -->
+    <div id="vbt-results" class="hidden">
+      <div class="chart-wrap mb-12">
+        <div class="label mb-8">Courbe de vitesse</div>
+        <canvas id="vbt-vel-chart" height="160"></canvas>
+      </div>
+      <div id="vbt-rep-results"></div>
+      <div class="grid-2 mb-12">
+        <div class="metric-box"><div class="metric-label">Perte vitesse</div><div class="metric-val" id="vbt-vloss" style="color:var(--orange)">—</div><div class="metric-unit">%</div></div>
+        <div class="metric-box"><div class="metric-label">Puissance pic</div><div class="metric-val" id="vbt-power" style="color:var(--green);font-size:24px">—</div><div class="metric-unit">W</div></div>
+      </div>
+      <div id="vbt-vloss-interp" class="interp-box hidden"></div>
+      <button class="btn btn-primary mt-12" style="margin-top:12px" onclick="vbtSave()" touch-action="manipulation">Enregistrer</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════ SPRINT ═══════════════════ -->
+<div class="view" id="view-sprint">
+<div class="page">
+  <div class="eyebrow">OUTIL 4</div>
+  <h2>Sprint & Profil F-V</h2>
+  <p class="subtext mb-16">Analyse de sprint vidéo + profil Force-Vitesse (méthode Morin 2012).</p>
+
+  <div class="sub-tabs">
+    <div class="sub-tab active" onclick="setSprintMode('video')">Analyse Vidéo</div>
+    <div class="sub-tab" onclick="setSprintMode('fv')">Profil F-V Sprint</div>
+    <div class="sub-tab" onclick="setSprintMode('brake')">Test Freinage</div>
+  </div>
+
+  <!-- SPRINT VIDEO MODE -->
+  <div id="sprint-video-mode">
+    <div class="warn-box">Filme le sprint de côté, caméra fixe. Marque alternativement chaque contact et décollage du pied.</div>
+
+    <div id="sprint-video-loader" class="card mb-12" style="text-align:center">
+      <div style="font-size:40px;margin-bottom:8px">🎬</div>
+      <label class="btn btn-primary" style="cursor:pointer">
+        Charger une vidéo sprint
+        <input type="file" accept="video/*" style="display:none" onchange="sprintLoadVideo(event)">
+      </label>
+    </div>
+
+    <div id="sprint-fps-row" class="card mb-12 hidden">
+      <div class="label mb-8">FPS de la vidéo</div>
+      <div class="fps-row" style="flex-wrap:wrap" id="sprint-fps-btns">
+        <span class="fps-label">FPS :</span>
+        <button class="fps-opt" onclick="setSprintFPS(30)">30</button>
+        <button class="fps-opt active" onclick="setSprintFPS(60)">60</button>
+        <button class="fps-opt" onclick="setSprintFPS(120)">120</button>
+        <button class="fps-opt" onclick="setSprintFPS(240)">240</button>
+      </div>
+    </div>
+
+    <div id="sprint-video-area" class="hidden">
+      <video id="sprint-video" playsinline webkit-playsinline muted style="display:none" preload="metadata"></video>
+      <div class="video-wrapper">
+        <canvas id="sprint-canvas" class="tool-canvas"></canvas>
+      </div>
+      <div class="frame-controls mb-12">
+        <button class="frame-btn" onclick="sprintSeek(-1)" touch-action="manipulation">‹</button>
+        <button class="frame-btn" onclick="sprintSeek(-5)" touch-action="manipulation" style="font-size:14px">‹‹</button>
+        <div class="frame-display" id="sprint-frame-display">Frame 0</div>
+        <button class="frame-btn" onclick="sprintSeek(5)" touch-action="manipulation" style="font-size:14px">››</button>
+        <button class="frame-btn" onclick="sprintSeek(1)" touch-action="manipulation">›</button>
+      </div>
+
+      <!-- Step markers list -->
+      <div class="card mb-12">
+        <div class="label mb-8">Marqueurs de foulées</div>
+        <div id="sprint-steps-list" style="font-size:13px;color:var(--gray);margin-bottom:10px">Aucun marqueur</div>
+        <div class="grid-2">
+          <button class="btn btn-ghost" onclick="sprintMarkContact()" touch-action="manipulation" id="sprint-contact-btn">🦶 Contact sol</button>
+          <button class="btn btn-ghost" onclick="sprintMarkTakeoff()" touch-action="manipulation" id="sprint-take-btn">🚀 Décollage</button>
+        </div>
+        <button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="sprintUndoLast()" touch-action="manipulation">↩ Annuler dernier</button>
+      </div>
+
+      <!-- Calibration for step length -->
+      <div class="card mb-12">
+        <div class="label mb-4">Étalonnage longueur</div>
+        <p class="subtext mb-8">Optionnel. Pour calculer la longueur de foulée.</p>
+        <input type="number" id="sprint-calib-px-dist" placeholder="Distance pixel (tap 2 pts sur canvas)" style="margin-bottom:8px">
+        <input type="number" id="sprint-calib-real" placeholder="Distance réelle (cm)">
+      </div>
+
+      <!-- Sprint results -->
+      <div id="sprint-results" class="hidden">
+        <div class="chart-wrap mb-12">
+          <div class="label mb-8">Temps de contact / vol par foulée</div>
+          <canvas id="sprint-steps-chart" height="160"></canvas>
+        </div>
+        <div class="grid-2 mb-12">
+          <div class="metric-box"><div class="metric-label">tc moyen</div><div class="metric-val" id="sprint-tc-avg" style="color:var(--orange)">—</div><div class="metric-unit">ms</div></div>
+          <div class="metric-box"><div class="metric-label">tf moyen</div><div class="metric-val" id="sprint-tf-avg" style="color:var(--green)">—</div><div class="metric-unit">ms</div></div>
+        </div>
+        <div class="grid-2 mb-12">
+          <div class="metric-box"><div class="metric-label">Fréquence</div><div class="metric-val" id="sprint-freq" style="color:var(--white);font-size:24px">—</div><div class="metric-unit">pas/s</div></div>
+          <div class="metric-box"><div class="metric-label">RSI sprint</div><div class="metric-val" id="sprint-rsi" style="color:var(--green);font-size:24px">—</div><div class="metric-unit">tf/tc</div></div>
+        </div>
+        <button class="btn btn-primary" onclick="sprintSave()" touch-action="manipulation">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FV PROFILE MODE -->
+  <div id="sprint-fv-mode" class="hidden">
+    <div class="card mb-12">
+      <div class="label mb-8">Paramètres athlète</div>
+      <div class="grid-2 mb-8">
+        <div><div class="label mb-4">Masse (kg)</div><input type="number" id="fv-mass" placeholder="ex: 70"></div>
+        <div><div class="label mb-4">Taille (m)</div><input type="number" id="fv-height" placeholder="ex: 1.75" step="0.01"></div>
+      </div>
+    </div>
+
+    <div class="card mb-12">
+      <div class="label mb-8">Temps de passage (s)</div>
+      <p class="subtext mb-12">Entre les temps depuis une borne de chrono ou une autre app.</p>
+      <div id="fv-split-inputs"></div>
+      <div class="grid-2 mb-8" style="margin-top:8px">
+        <button class="btn btn-ghost btn-sm" onclick="fvAddSplit()" touch-action="manipulation">+ Ajouter distance</button>
+        <button class="btn btn-ghost btn-sm" onclick="fvRemoveSplit()" touch-action="manipulation">− Retirer</button>
+      </div>
+    </div>
+
+    <button class="btn btn-primary mb-12" onclick="calcFVProfile()" touch-action="manipulation">Calculer le profil F-V</button>
+
+    <div id="fv-results" class="hidden">
+      <div class="chart-wrap mb-12">
+        <div class="label mb-8">Profil Force-Vitesse</div>
+        <canvas id="fv-chart" height="200"></canvas>
+      </div>
+      <div class="grid-2 mb-12">
+        <div class="metric-box"><div class="metric-label">F₀</div><div class="metric-val" id="fv-f0" style="color:var(--red)">—</div><div class="metric-unit">N/kg</div></div>
+        <div class="metric-box"><div class="metric-label">V₀</div><div class="metric-val" id="fv-v0" style="color:var(--green)">—</div><div class="metric-unit">m/s</div></div>
+      </div>
+      <div class="grid-2 mb-12">
+        <div class="metric-box"><div class="metric-label">Pmax</div><div class="metric-val" id="fv-pmax" style="color:var(--orange);font-size:24px">—</div><div class="metric-unit">W/kg</div></div>
+        <div class="metric-box"><div class="metric-label">DRF</div><div class="metric-val" id="fv-drf" style="color:var(--white);font-size:24px">—</div><div class="metric-unit">%/m·s⁻¹</div></div>
+      </div>
+      <div id="fv-interp" class="interp-box hidden"></div>
+      <button class="btn btn-primary mt-12" style="margin-top:12px" onclick="fvSave()" touch-action="manipulation">Enregistrer</button>
+    </div>
+  </div>
+
+  <!-- BRAKE TEST MODE -->
+  <div id="sprint-brake-mode" class="hidden">
+    <div class="card mb-12">
+      <div class="label mb-8">Test de freinage</div>
+      <div class="grid-2 mb-8">
+        <div><div class="label mb-4">Vitesse init. (m/s)</div><input type="number" id="brake-v0" placeholder="ex: 7.5" step="0.1"></div>
+        <div><div class="label mb-4">Distance frein. (m)</div><input type="number" id="brake-dist" placeholder="ex: 4.2" step="0.1"></div>
+      </div>
+      <div class="label mb-4 mt-8">Masse (kg)</div>
+      <input type="number" id="brake-mass" placeholder="ex: 70" style="margin-bottom:12px">
+      <button class="btn btn-primary" onclick="calcBrake()" touch-action="manipulation">Calculer</button>
+    </div>
+    <div id="brake-results" class="hidden">
+      <div class="grid-2 mb-12">
+        <div class="metric-box"><div class="metric-label">Décélération</div><div class="metric-val" id="brake-decel" style="color:var(--red)">—</div><div class="metric-unit">m/s²</div></div>
+        <div class="metric-box"><div class="metric-label">Force frein.</div><div class="metric-val" id="brake-force" style="color:var(--orange);font-size:24px">—</div><div class="metric-unit">N/kg</div></div>
+      </div>
+      <div id="brake-interp" class="interp-box"></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <div class="nav-items">
+    <button class="nav-item active" id="nav-incl" onclick="navigate('incl')" touch-action="manipulation">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2L2 22h20L12 2z"/><line x1="12" y1="10" x2="12" y2="16"/></svg>
+      Incliné
+    </button>
+    <button class="nav-item" id="nav-sauts" onclick="navigate('sauts')" touch-action="manipulation">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 20 L12 4 L19 20"/><line x1="8" y1="14" x2="16" y2="14"/></svg>
+      Sauts
+    </button>
+    <button class="nav-item" id="nav-vbt" onclick="navigate('vbt')" touch-action="manipulation">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      VBT
+    </button>
+    <button class="nav-item" id="nav-sprint" onclick="navigate('sprint')" touch-action="manipulation">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      Sprint
+    </button>
+    <button class="nav-item" id="nav-back" onclick="goBack()" touch-action="manipulation">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Retour
+    </button>
+  </div>
+</nav>
+
+<script>
+// ═══════════════════════════════════════════════
+//  ROUTER
+// ═══════════════════════════════════════════════
+const TABS = ['incl','sauts','vbt','sprint'];
+let currentTab = 'incl';
+
+function navigate(tab) {
+  if (tab === 'back') { goBack(); return; }
+  currentTab = tab;
+  TABS.forEach(t => {
+    document.getElementById('view-' + t).classList.toggle('active', t === tab);
+    const n = document.getElementById('nav-' + t);
+    if (n) n.classList.toggle('active', t === tab);
+  });
+  window.location.hash = tab;
+  if (tab === 'incl') renderInclHistory();
+  if (tab === 'sauts') renderJumpHistory();
+}
+
+function goBack() { window.location.href = 'index.html'; }
+
+// Init from hash
+(function() {
+  const h = window.location.hash.replace('#','');
+  if (TABS.includes(h)) navigate(h);
+  else navigate('incl');
+  // Init FV splits
+  fvSplits = [{dist:10,time:''},{dist:20,time:''},{dist:30,time:''}];
+  renderFVSplits();
+  renderInclHistory();
+  renderJumpHistory();
+})();
+
+// ═══════════════════════════════════════════════
+//  MOVEMENTS (INCLINOMÈTRE)
+// ═══════════════════════════════════════════════
+const MOVEMENTS = [
+  { key:'epaule_flex', label:'Épaule Flex.', desc:"Bras tendu levé vers l'avant (dos au mur)", normal:[160,180], axis:'beta', icon:'🦾' },
+  { key:'epaule_ext', label:'Épaule Ext.', desc:"Bras tendu vers l'arrière", normal:[40,60], axis:'beta', icon:'🦾' },
+  { key:'rot_int', label:'Rot. Interne Épaule', desc:"Coude à 90°, avant-bras vers l'intérieur", normal:[60,80], axis:'gamma', icon:'🔄' },
+  { key:'rot_ext', label:'Rot. Externe Épaule', desc:"Coude à 90°, avant-bras vers l'extérieur", normal:[70,90], axis:'gamma', icon:'🔄' },
+  { key:'hanche_flex', label:'Hanche Flex.', desc:"Cuisse vers la poitrine, allongé", normal:[100,120], axis:'beta', icon:'🦵' },
+  { key:'hanche_ext', label:'Hanche Ext.', desc:"Jambe en arrière, fente basse", normal:[10,20], axis:'beta', icon:'🦵' },
+  { key:'rot_hanche', label:'Rot. Hanche', desc:"Assis bord de table, rotation tibia", normal:[40,50], axis:'gamma', icon:'🔄' },
+  { key:'cou', label:'Cou Flex/Ext.', desc:"Tête vers l'avant / l'arrière", normal:[40,50], axis:'beta', icon:'🧠' },
+  { key:'rot_dos', label:'Rot. Dos', desc:"Assis, rotation du buste", normal:[35,50], axis:'gamma', icon:'🔄' },
+  { key:'incl_dos', label:'Incl. Latérale Dos', desc:"Penche latéralement", normal:[20,30], axis:'gamma', icon:'📐' },
+  { key:'dorsiflex', label:'Dorsiflexion', desc:"Talon au sol, genou vers mur", normal:[35,45], axis:'beta', icon:'🦶' },
+];
+
+// Render movement grid
+function renderMvtGrid() {
+  const g = document.getElementById('mvt-grid');
+  g.innerHTML = MOVEMENTS.map((m,i) => `
+    <button class="mvt-btn${inclSelectedIdx===i?' active':''}" onclick="selectMovement(${i})" touch-action="manipulation">
+      <span>${m.icon}</span>${m.label}
+    </button>
+  `).join('');
+}
+
+// INCLINOMÈTRE STATE
+let inclSelectedIdx = 0;
+let inclSide = 'Droit';
+let inclCalibOffset = 0;
+let inclActive = false;
+let inclCountdownTimer = null;
+let inclMaxAngle = 0;
+let inclCaptureWindow = false;
+let inclCurrentAngle = 0;
+
+renderMvtGrid();
+
+function selectMovement(idx) {
+  inclSelectedIdx = idx;
+  renderMvtGrid();
+  const m = MOVEMENTS[idx];
+  const info = document.getElementById('mvt-info');
+  info.classList.remove('hidden');
+  info.innerHTML = `<strong>${m.icon} ${m.label}</strong> — ${m.desc}<br><span style="color:var(--green)">Norme : ${m.normal[0]}°–${m.normal[1]}°</span>`;
+  document.getElementById('incl-status').textContent = 'Mouvement sélectionné. Appuie sur Démarrer.';
+  document.getElementById('incl-result-box').classList.add('hidden');
+}
+
+selectMovement(0);
+
+function setSide(side) {
+  inclSide = side;
+  document.getElementById('side-droit').classList.toggle('active', side==='Droit');
+  document.getElementById('side-gauche').classList.toggle('active', side==='Gauche');
+}
+
+function inclCalibrate() {
+  inclCalibOffset = inclCurrentAngle;
+  showToast('Calibré — angle = 0°');
+}
+
+async function inclStart() {
+  const m = MOVEMENTS[inclSelectedIdx];
+  // iOS permission
+  const ok = await requestMotionPerm();
+  if (!ok) { showToast('Permission capteur refusée'); return; }
+
+  // Reset
+  inclMaxAngle = 0;
+  inclCaptureWindow = false;
+  inclActive = true;
+  document.getElementById('incl-start-btn').classList.add('hidden');
+  document.getElementById('incl-stop-btn').classList.remove('hidden');
+  document.getElementById('incl-result-box').classList.add('hidden');
+
+  window.addEventListener('deviceorientation', onInclOrientation, true);
+
+  // 5-second countdown
+  let count = 5;
+  const cd = document.getElementById('incl-countdown-display');
+  const status = document.getElementById('incl-status');
+  cd.style.display = 'flex';
+  cd.textContent = count;
+
+  inclCountdownTimer = setInterval(() => {
+    count--;
+    if (count > 0) {
+      cd.textContent = count;
+      if (count <= 2) { inclCaptureWindow = true; }
+    } else {
+      clearInterval(inclCountdownTimer);
+      cd.style.display = 'none';
+      inclStop();
+      showInclResult();
+    }
+  }, 1000);
+  status.textContent = 'Maintiens la position maximale…';
+}
+
+function inclStop() {
+  inclActive = false;
+  clearInterval(inclCountdownTimer);
+  document.getElementById('incl-start-btn').classList.remove('hidden');
+  document.getElementById('incl-stop-btn').classList.add('hidden');
+  document.getElementById('incl-countdown-display').style.display = 'none';
+  window.removeEventListener('deviceorientation', onInclOrientation, true);
+  if (inclMaxAngle > 0) showInclResult();
+}
+
+function onInclOrientation(e) {
+  const m = MOVEMENTS[inclSelectedIdx];
+  let raw = m.axis === 'beta' ? (e.beta || 0) : (e.gamma || 0);
+  let angle = Math.abs(Math.round(raw - inclCalibOffset));
+  inclCurrentAngle = angle;
+  document.getElementById('incl-live').textContent = angle + '°';
+  document.getElementById('incl-live').style.color = getAngleColor(angle, m.normal);
+  if (inclCaptureWindow && angle > inclMaxAngle) inclMaxAngle = angle;
+}
+
+function showInclResult() {
+  const m = MOVEMENTS[inclSelectedIdx];
+  const angle = inclMaxAngle;
+  if (angle === 0) return;
+  const col = getAngleColor(angle, m.normal);
+  const box = document.getElementById('incl-result-box');
+  box.classList.remove('hidden');
+  const val = document.getElementById('incl-captured-val');
+  val.textContent = angle + '°';
+  val.style.color = col;
+  const interp = document.getElementById('incl-interp');
+  if (angle >= m.normal[0]) {
+    interp.className = 'interp-box interp-green';
+    interp.textContent = '✅ Dans la norme (' + m.normal[0] + '–' + m.normal[1] + '°)';
+  } else if (angle >= m.normal[0] * 0.85) {
+    interp.className = 'interp-box interp-orange';
+    interp.textContent = '⚠️ Légèrement sous la norme — travail de mobilité recommandé';
+  } else {
+    interp.className = 'interp-box interp-red';
+    interp.textContent = '❌ Sous la norme — déficit de mobilité significatif';
+  }
+  document.getElementById('incl-status').textContent = 'Mesure capturée';
+  saveInclMeasure(m.key, inclSide, angle);
+}
+
+function getAngleColor(angle, normal) {
+  if (angle >= normal[0]) return 'var(--green)';
+  if (angle >= normal[0] * 0.85) return 'var(--orange)';
+  return 'var(--red)';
+}
+
+function saveInclMeasure(movement, side, angle) {
+  const data = JSON.parse(localStorage.getItem('outils_incl') || '[]');
+  data.unshift({ movement, side, angle, date: new Date().toISOString() });
+  if (data.length > 50) data.length = 50;
+  localStorage.setItem('outils_incl', JSON.stringify(data));
+  renderInclHistory();
+}
+
+function renderInclHistory() {
+  const data = JSON.parse(localStorage.getItem('outils_incl') || '[]');
+  const el = document.getElementById('incl-history');
+  if (!data.length) { el.innerHTML = '<span style="color:var(--dim);font-size:13px">Aucune mesure</span>'; return; }
+  el.innerHTML = data.slice(0,5).map(d => {
+    const m = MOVEMENTS.find(mv => mv.key === d.movement) || {label:d.movement, normal:[0,0]};
+    const col = getAngleColor(d.angle, m.normal);
+    const cls = col.includes('green') ? 'chip-green' : col.includes('orange') ? 'chip-orange' : 'chip-red';
+    return `<div class="chip ${cls}">${m.icon||''} ${d.angle}° <span style="color:var(--gray);font-weight:400">${d.side}</span></div>`;
+  }).join('');
+}
+
+async function requestMotionPerm() {
+  if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+    try {
+      const perm = await DeviceOrientationEvent.requestPermission();
+      return perm === 'granted';
+    } catch(e) { return false; }
+  }
+  return true;
+}
+
+// ═══════════════════════════════════════════════
+//  JUMP ANALYSIS
+// ═══════════════════════════════════════════════
+let jumpFPS = 60;
+let jumpMode = 'cmj';
+let jumpVideo = null;
+let jumpCanvas = null;
+let jumpCtx = null;
+let jumpTakeoffFrame = null;
+let jumpLandingFrame = null;
+
+// RSI state
+let rsiMarkers = []; // array of {type:'takeoff'|'landing', frame}
+let rsiCurrentSlot = 0; // 0..19
+
+// Horizontal state
+let horizCalibA = null;
+let horizCalibB = null;
+let horizPxPerCm = null;
+let horizCalibMode = true;
+let horizTakeoffX = null;
+let horizLandingX = null;
+
+function setJumpMode(mode) {
+  jumpMode = mode;
+  document.querySelectorAll('#jump-subtabs .sub-tab').forEach((el,i) => {
+    el.classList.toggle('active', ['cmj','sj','rsi','horiz'][i] === mode);
+  });
+  document.getElementById('jump-cmj-ctrl').classList.toggle('hidden', !['cmj','sj'].includes(mode));
+  document.getElementById('jump-rsi-ctrl').classList.toggle('hidden', mode !== 'rsi');
+  document.getElementById('jump-horiz-ctrl').classList.toggle('hidden', mode !== 'horiz');
+  // Reset markers
+  jumpTakeoffFrame = null;
+  jumpLandingFrame = null;
+  document.getElementById('jump-result').classList.add('hidden');
+  document.getElementById('jump-times').classList.add('hidden');
+  if (mode === 'rsi') { rsiMarkers=[]; rsiCurrentSlot=0; renderRSIGrid(); }
+  if (mode === 'horiz') {
+    horizCalibA=null; horizCalibB=null; horizPxPerCm=null;
+    horizCalibMode=true; horizTakeoffX=null; horizLandingX=null;
+    document.getElementById('horiz-marks-box').classList.add('hidden');
+    document.getElementById('horiz-calib-box').classList.remove('hidden');
+    document.getElementById('horiz-result').classList.add('hidden');
+  }
+  if (jumpCanvas) jumpDrawFrame();
+}
+
+function setJumpFPS(fps) {
+  jumpFPS = fps;
+  document.querySelectorAll('#fps-btns .fps-opt').forEach(b => b.classList.toggle('active', b.textContent.includes(fps)));
+}
+
+function jumpLoadVideo(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  jumpVideo = document.getElementById('jump-video');
+  jumpCanvas = document.getElementById('jump-canvas');
+  jumpCtx = jumpCanvas.getContext('2d');
+  const url = URL.createObjectURL(file);
+  jumpVideo.src = url;
+  jumpVideo.load();
+  jumpVideo.onloadedmetadata = () => {
+    document.getElementById('jump-video-loader').classList.add('hidden');
+    document.getElementById('jump-fps-row').classList.remove('hidden');
+    document.getElementById('jump-video-area').classList.remove('hidden');
+    jumpCanvas.width = jumpVideo.videoWidth || 640;
+    jumpCanvas.height = jumpVideo.videoHeight || 360;
+    jumpVideo.currentTime = 0;
+    jumpVideo.onseeked = jumpDrawFrame;
+    jumpDrawFrame();
+  };
+  // Canvas touch
+  jumpCanvas.addEventListener('touchstart', jumpCanvasTouch, {passive:false});
+  jumpCanvas.addEventListener('click', jumpCanvasClick);
+}
+
+function jumpDrawFrame() {
+  if (!jumpCtx || !jumpVideo) return;
+  jumpCtx.drawImage(jumpVideo, 0, 0, jumpCanvas.width, jumpCanvas.height);
+  const frame = Math.round(jumpVideo.currentTime * jumpFPS);
+  document.getElementById('jump-frame-display').textContent = 'Frame ' + frame + ' (' + jumpVideo.currentTime.toFixed(3) + 's)';
+  // Draw takeoff/landing markers
+  if (jumpTakeoffFrame !== null) {
+    jumpCtx.strokeStyle = '#7ED957';
+    jumpCtx.lineWidth = 3;
+    jumpCtx.beginPath();
+    jumpCtx.moveTo(0, jumpCanvas.height/2);
+    jumpCtx.lineTo(jumpCanvas.width, jumpCanvas.height/2);
+    jumpCtx.stroke();
+    jumpCtx.fillStyle = '#7ED957';
+    jumpCtx.font = 'bold 18px system-ui';
+    jumpCtx.fillText('🛫 F' + jumpTakeoffFrame, 10, 30);
+  }
+  if (jumpLandingFrame !== null) {
+    jumpCtx.fillStyle = '#FF5757';
+    jumpCtx.font = 'bold 18px system-ui';
+    jumpCtx.fillText('🛬 F' + jumpLandingFrame, 10, 55);
+  }
+  // Horizontal calibration points
+  if (jumpMode === 'horiz') {
+    if (horizCalibA) drawCircle(jumpCtx, horizCalibA.x, horizCalibA.y, '#7ED957', 'A');
+    if (horizCalibB) drawCircle(jumpCtx, horizCalibB.x, horizCalibB.y, '#FFBD59', 'B');
+    if (horizCalibA && horizCalibB) {
+      jumpCtx.strokeStyle = '#FFBD59';
+      jumpCtx.setLineDash([6,4]);
+      jumpCtx.lineWidth = 2;
+      jumpCtx.beginPath();
+      jumpCtx.moveTo(horizCalibA.x, horizCalibA.y);
+      jumpCtx.lineTo(horizCalibB.x, horizCalibB.y);
+      jumpCtx.stroke();
+      jumpCtx.setLineDash([]);
+    }
+    if (horizTakeoffX !== null) {
+      jumpCtx.strokeStyle = '#7ED957';
+      jumpCtx.lineWidth = 3;
+      jumpCtx.setLineDash([]);
+      jumpCtx.beginPath();
+      jumpCtx.moveTo(horizTakeoffX, 0);
+      jumpCtx.lineTo(horizTakeoffX, jumpCanvas.height);
+      jumpCtx.stroke();
+    }
+    if (horizLandingX !== null) {
+      jumpCtx.strokeStyle = '#FF5757';
+      jumpCtx.lineWidth = 3;
+      jumpCtx.beginPath();
+      jumpCtx.moveTo(horizLandingX, 0);
+      jumpCtx.lineTo(horizLandingX, jumpCanvas.height);
+      jumpCtx.stroke();
+    }
+  }
+}
+
+function drawCircle(ctx, x, y, color, label) {
+  ctx.beginPath();
+  ctx.arc(x, y, 10, 0, Math.PI*2);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 3;
+  ctx.stroke();
+  ctx.fillStyle = color;
+  ctx.font = 'bold 14px system-ui';
+  ctx.fillText(label, x+14, y+5);
+}
+
+function jumpSeek(delta) {
+  if (!jumpVideo) return;
+  jumpVideo.currentTime = Math.max(0, jumpVideo.currentTime + delta / jumpFPS);
+  setTimeout(jumpDrawFrame, 50);
+}
+
+function jumpMarkTakeoff() {
+  if (!jumpVideo) return;
+  jumpTakeoffFrame = Math.round(jumpVideo.currentTime * jumpFPS);
+  document.getElementById('jump-take-btn').style.borderColor = 'var(--green)';
+  document.getElementById('jump-take-val').textContent = 'F' + jumpTakeoffFrame + ' (' + jumpVideo.currentTime.toFixed(3) + 's)';
+  document.getElementById('jump-times').classList.remove('hidden');
+  jumpDrawFrame();
+  tryComputeJump();
+}
+
+function jumpMarkLanding() {
+  if (!jumpVideo) return;
+  jumpLandingFrame = Math.round(jumpVideo.currentTime * jumpFPS);
+  document.getElementById('jump-land-btn').style.borderColor = 'var(--red)';
+  document.getElementById('jump-land-val').textContent = 'F' + jumpLandingFrame + ' (' + jumpVideo.currentTime.toFixed(3) + 's)';
+  document.getElementById('jump-times').classList.remove('hidden');
+  jumpDrawFrame();
+  tryComputeJump();
+}
+
+function tryComputeJump() {
+  if (jumpTakeoffFrame === null || jumpLandingFrame === null) return;
+  const takeTime = jumpTakeoffFrame / jumpFPS;
+  const landTime = jumpLandingFrame / jumpFPS;
+  if (landTime <= takeTime) { showToast("L'atterrissage doit être après le décollage"); return; }
+  const flightMs = Math.round((landTime - takeTime) * 1000);
+  const heightCm = flightTimeToHeight(flightMs);
+  document.getElementById('jump-flightms').textContent = flightMs;
+  document.getElementById('jump-height').textContent = heightCm.toFixed(1);
+  // Badge by height
+  const badge = jumpHeightBadge(heightCm);
+  document.getElementById('jump-level-badge').innerHTML = badge.html;
+  const interp = document.getElementById('jump-interp');
+  if (heightCm >= 50) { interp.className='interp-box interp-green'; interp.textContent='✅ Excellent — niveau élite'; }
+  else if (heightCm >= 40) { interp.className='interp-box interp-green'; interp.textContent='✅ Très bon — niveau compétiteur confirmé'; }
+  else if (heightCm >= 30) { interp.className='interp-box interp-orange'; interp.textContent='⚠️ Moyen — progression possible'; }
+  else { interp.className='interp-box interp-red'; interp.textContent='❌ À développer — travail pliométrique recommandé'; }
+  document.getElementById('jump-result').classList.remove('hidden');
+}
+
+function flightTimeToHeight(flightTimeMs) {
+  const t = flightTimeMs / 1000;
+  return (9.81 * t * t / 8) * 100;
+}
+
+function jumpHeightBadge(h) {
+  if (h >= 50) return {html:'<span class="badge badge-green">Élite 🏆</span>'};
+  if (h >= 40) return {html:'<span class="badge badge-green">Excellent</span>'};
+  if (h >= 30) return {html:'<span class="badge badge-orange">Intermédiaire</span>'};
+  return {html:'<span class="badge badge-red">Débutant</span>'};
+}
+
+function jumpSave() {
+  if (jumpTakeoffFrame===null || jumpLandingFrame===null) return;
+  const takeTime = jumpTakeoffFrame / jumpFPS;
+  const landTime = jumpLandingFrame / jumpFPS;
+  const flightMs = Math.round((landTime - takeTime) * 1000);
+  const heightCm = flightTimeToHeight(flightMs);
+  const data = JSON.parse(localStorage.getItem('outils_jumps') || '[]');
+  data.unshift({ mode:jumpMode, flightMs, heightCm: heightCm.toFixed(1), fps:jumpFPS, date:new Date().toISOString() });
+  if (data.length > 30) data.length = 30;
+  localStorage.setItem('outils_jumps', JSON.stringify(data));
+  showToast('Saut enregistré ✓');
+  renderJumpHistory();
+}
+
+function renderJumpHistory() {
+  const data = JSON.parse(localStorage.getItem('outils_jumps') || '[]');
+  const el = document.getElementById('jump-history');
+  if (!data.length) { el.innerHTML = '<span style="color:var(--dim);font-size:13px">Aucun résultat</span>'; return; }
+  el.innerHTML = data.slice(0,5).map(d => `
+    <div class="result-row">
+      <div><span style="font-weight:700">${d.mode?.toUpperCase()||'CMJ'}</span> <span style="color:var(--gray);font-size:12px">${new Date(d.date).toLocaleDateString('fr')}</span></div>
+      <div style="font-size:18px;font-weight:900;color:var(--green)">${d.heightCm} cm</div>
+    </div>
+  `).join('');
+}
+
+// Canvas touch helper
+function getCanvasPos(canvas, e) {
+  const rect = canvas.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  let cx, cy;
+  if (e.touches) {
+    cx = (e.touches[0].clientX - rect.left) * scaleX;
+    cy = (e.touches[0].clientY - rect.top) * scaleY;
+  } else {
+    cx = (e.clientX - rect.left) * scaleX;
+    cy = (e.clientY - rect.top) * scaleY;
+  }
+  return {x:Math.round(cx), y:Math.round(cy)};
+}
+
+function jumpCanvasTouch(e) { e.preventDefault(); jumpCanvasClick(e); }
+function jumpCanvasClick(e) {
+  if (!jumpCanvas) return;
+  const pos = getCanvasPos(jumpCanvas, e);
+  if (jumpMode === 'horiz') {
+    if (horizCalibMode) {
+      if (!horizCalibA) {
+        horizCalibA = pos;
+        document.getElementById('calib-a-val').textContent = `(${pos.x}, ${pos.y})`;
+      } else if (!horizCalibB) {
+        horizCalibB = pos;
+        document.getElementById('calib-b-val').textContent = `(${pos.x}, ${pos.y})`;
+      }
+    } else {
+      // mark takeoff or landing x
+      if (horizTakeoffX === null) { horizTakeoffX = pos.x; showToast('Décollage marqué'); }
+      else if (horizLandingX === null) {
+        horizLandingX = pos.x;
+        calcHorizJump();
+      }
+    }
+    jumpDrawFrame();
+  }
+}
+
+function horizValidateCalib() {
+  if (!horizCalibA || !horizCalibB) { showToast('Marque 2 points sur la vidéo'); return; }
+  const realDist = parseFloat(document.getElementById('calib-real-dist').value);
+  if (!realDist || realDist <= 0) { showToast('Entre la distance réelle en cm'); return; }
+  const pxDist = Math.sqrt(Math.pow(horizCalibB.x - horizCalibA.x,2) + Math.pow(horizCalibB.y - horizCalibA.y,2));
+  horizPxPerCm = pxDist / realDist;
+  horizCalibMode = false;
+  document.getElementById('horiz-calib-box').classList.add('hidden');
+  document.getElementById('horiz-marks-box').classList.remove('hidden');
+  showToast(`Étalonnage: ${horizPxPerCm.toFixed(1)} px/cm`);
+}
+
+function horizMarkTakeoff() { horizTakeoffX = null; showToast('Tape sur la vidéo — position décollage'); }
+function horizMarkLanding() { if (horizTakeoffX !== null) { horizLandingX = null; showToast('Tape sur la vidéo — position réception'); } }
+
+function calcHorizJump() {
+  if (horizTakeoffX === null || horizLandingX === null || !horizPxPerCm) return;
+  const pxDist = Math.abs(horizLandingX - horizTakeoffX);
+  const cm = pxDist / horizPxPerCm;
+  document.getElementById('horiz-dist-val').textContent = cm.toFixed(1);
+  document.getElementById('horiz-result').classList.remove('hidden');
+}
+
+function horizSave() {
+  const val = document.getElementById('horiz-dist-val').textContent;
+  const data = JSON.parse(localStorage.getItem('outils_jumps') || '[]');
+  data.unshift({ mode:'horiz', distCm:val, fps:jumpFPS, date:new Date().toISOString() });
+  localStorage.setItem('outils_jumps', JSON.stringify(data));
+  showToast('Saut horizontal enregistré ✓');
+  renderJumpHistory();
+}
+
+// RSI
+function renderRSIGrid() {
+  const g = document.getElementById('rsi-rep-grid');
+  const labels = [];
+  for (let i=0;i<10;i++) { labels.push('T'+(i+1)); labels.push('A'+(i+1)); }
+  g.innerHTML = labels.map((l,i) => {
+    const m = rsiMarkers[i];
+    let cls = 'rep-cell';
+    if (m) cls += (i%2===0) ? ' take' : ' land';
+    if (i === rsiCurrentSlot && !m) cls += ' active';
+    return `<div class="${cls}">${l}</div>`;
+  }).join('');
+  const next = rsiCurrentSlot;
+  const nextLbl = document.getElementById('rsi-next-label');
+  if (next >= 20) {
+    nextLbl.textContent = '✅ Tous les marqueurs enregistrés — calcul ci-dessous';
+    calcRSIResults();
+  } else {
+    nextLbl.textContent = (next%2===0) ? `Marque le Décollage ${Math.floor(next/2)+1}` : `Marque l'Atterrissage ${Math.floor(next/2)+1}`;
+  }
+}
+
+function rsiMarkFrame() {
+  if (!jumpVideo || rsiCurrentSlot >= 20) return;
+  const frame = Math.round(jumpVideo.currentTime * jumpFPS);
+  rsiMarkers[rsiCurrentSlot] = { type: rsiCurrentSlot%2===0 ? 'takeoff':'landing', frame };
+  rsiCurrentSlot++;
+  renderRSIGrid();
+}
+
+function calcRSIResults() {
+  const pairs = [];
+  for (let i=0;i<10;i++) {
+    const take = rsiMarkers[i*2];
+    const land = rsiMarkers[i*2+1];
+    if (take && land) {
+      pairs.push({ flightMs: Math.round((land.frame - take.frame) / jumpFPS * 1000) });
+    }
+  }
+  // contact times
+  const rsiVals = [];
+  for (let i=0;i<pairs.length-1;i++) {
+    const contactMs = Math.round((rsiMarkers[(i+1)*2].frame - rsiMarkers[i*2+1].frame) / jumpFPS * 1000);
+    const rsi = pairs[i].flightMs / contactMs;
+    rsiVals.push({ flight:pairs[i].flightMs, contact:contactMs, rsi:rsi.toFixed(2) });
+  }
+  const avg = rsiVals.length ? (rsiVals.reduce((a,b)=>a+parseFloat(b.rsi),0)/rsiVals.length).toFixed(2) : 0;
+  const res = document.getElementById('rsi-results');
+  res.classList.remove('hidden');
+  res.innerHTML = `
+    <div class="metric-box mb-12"><div class="metric-label">RSI Moyen</div><div class="metric-val" style="color:${parseFloat(avg)>=2?'var(--green)':'var(--orange)'}">${avg}</div><div class="metric-unit">>2.0 = Excellent</div></div>
+    <div class="card-sm mb-12">
+      ${rsiVals.map((r,i)=>`<div class="result-row"><span style="font-weight:700">Rep ${i+1}</span><span>vol ${r.flight}ms · contact ${r.contact}ms</span><span style="font-weight:900;color:${parseFloat(r.rsi)>=2?'var(--green)':'var(--orange)'}">RSI ${r.rsi}</span></div>`).join('')}
+    </div>
+    <button class="btn btn-primary" onclick="rsiSave(${JSON.stringify(avg).replace(/"/g,"'")})" touch-action="manipulation">Enregistrer</button>
+  `;
+}
+
+function rsiSave(avg) {
+  const data = JSON.parse(localStorage.getItem('outils_jumps') || '[]');
+  data.unshift({ mode:'rsi', rsiAvg:avg, date:new Date().toISOString() });
+  localStorage.setItem('outils_jumps', JSON.stringify(data));
+  showToast('RSI enregistré ✓');
+  renderJumpHistory();
+}
+
+// ═══════════════════════════════════════════════
+//  VBT VIDEO
+// ═══════════════════════════════════════════════
+let vbtFPS = 60;
+let vbtVideo = null;
+let vbtCanvas = null;
+let vbtCtx = null;
+let vbtCalibA = null;
+let vbtCalibB = null;
+let vbtPxPerCm = null;
+let vbtCalibMode = false;
+let vbtBarPos = null;
+let vbtPositions = []; // [{y, frame}]
+let vbtVelChart = null;
+let vbtCalibStep = 0; // 0=waiting, 1=A, 2=B
+
+function setVbtFPS(fps) {
+  vbtFPS = fps;
+  document.querySelectorAll('#vbt-fps-btns .fps-opt').forEach(b => b.classList.toggle('active', b.textContent.includes(fps)));
+}
+
+function vbtLoadVideo(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  vbtVideo = document.getElementById('vbt-video');
+  vbtCanvas = document.getElementById('vbt-canvas');
+  vbtCtx = vbtCanvas.getContext('2d');
+  const url = URL.createObjectURL(file);
+  vbtVideo.src = url;
+  vbtVideo.load();
+  vbtVideo.onloadedmetadata = () => {
+    document.getElementById('vbt-step2').classList.remove('hidden');
+    document.getElementById('vbt-video-area').classList.remove('hidden');
+    vbtCanvas.width = vbtVideo.videoWidth || 640;
+    vbtCanvas.height = vbtVideo.videoHeight || 360;
+    vbtVideo.currentTime = 0;
+    vbtVideo.onseeked = vbtDrawFrame;
+    vbtDrawFrame();
+    vbtCalibStep = 1;
+    showToast('Tape 2 points sur la vidéo pour étalonner');
+  };
+  vbtCanvas.addEventListener('touchstart', vbtCanvasTouch, {passive:false});
+  vbtCanvas.addEventListener('click', vbtCanvasClick);
+}
+
+function vbtDrawFrame() {
+  if (!vbtCtx || !vbtVideo) return;
+  vbtCtx.drawImage(vbtVideo, 0, 0, vbtCanvas.width, vbtCanvas.height);
+  const frame = Math.round(vbtVideo.currentTime * vbtFPS);
+  document.getElementById('vbt-frame-display').textContent = 'Frame ' + frame;
+  if (vbtCalibA) drawCircle(vbtCtx, vbtCalibA.x, vbtCalibA.y, '#7ED957', 'A');
+  if (vbtCalibB) drawCircle(vbtCtx, vbtCalibB.x, vbtCalibB.y, '#FFBD59', 'B');
+  if (vbtBarPos) {
+    vbtCtx.beginPath();
+    vbtCtx.arc(vbtBarPos.x, vbtBarPos.y, 14, 0, Math.PI*2);
+    vbtCtx.strokeStyle = 'var(--green)';
+    vbtCtx.lineWidth = 3;
+    vbtCtx.stroke();
+    vbtCtx.strokeStyle = '#fff';
+    vbtCtx.lineWidth = 1;
+    vbtCtx.beginPath();
+    vbtCtx.moveTo(vbtBarPos.x - 18, vbtBarPos.y);
+    vbtCtx.lineTo(vbtBarPos.x + 18, vbtBarPos.y);
+    vbtCtx.stroke();
+  }
+}
+
+function vbtSeek(delta) {
+  if (!vbtVideo) return;
+  vbtVideo.currentTime = Math.max(0, vbtVideo.currentTime + delta / vbtFPS);
+  setTimeout(vbtDrawFrame, 50);
+}
+
+function vbtCanvasTouch(e) { e.preventDefault(); vbtCanvasClick(e); }
+function vbtCanvasClick(e) {
+  if (!vbtCanvas) return;
+  const pos = getCanvasPos(vbtCanvas, e);
+  if (vbtCalibStep === 1) {
+    vbtCalibA = pos;
+    document.getElementById('vbt-calib-a').textContent = `(${pos.x}, ${pos.y})`;
+    vbtCalibStep = 2;
+    showToast('Point A défini — tape le point B');
+  } else if (vbtCalibStep === 2) {
+    vbtCalibB = pos;
+    document.getElementById('vbt-calib-b').textContent = `(${pos.x}, ${pos.y})`;
+    vbtCalibStep = 0;
+    showToast('Points définis — entre la distance réelle et valide');
+  } else if (vbtCalibStep === 3) {
+    // Marking bar
+    vbtBarPos = pos;
+    document.getElementById('vbt-bar-pos').textContent = `Position: (${pos.x}, ${pos.y})`;
+    document.getElementById('vbt-track-btn').classList.remove('btn-disabled');
+    showToast('Barre marquée ✓');
+    vbtDrawFrame();
+  }
+}
+
+function vbtValidateCalib() {
+  if (!vbtCalibA || !vbtCalibB) { showToast('Tape 2 points sur la vidéo'); return; }
+  const realDist = parseFloat(document.getElementById('vbt-calib-dist').value);
+  if (!realDist || realDist <= 0) { showToast('Entre la distance réelle en cm'); return; }
+  const dx = vbtCalibB.x - vbtCalibA.x;
+  const dy = vbtCalibB.y - vbtCalibA.y;
+  const pxDist = Math.sqrt(dx*dx + dy*dy);
+  vbtPxPerCm = pxDist / realDist;
+  vbtCalibStep = 3;
+  document.getElementById('vbt-step4').classList.remove('hidden');
+  showToast(`Étalonnage OK: ${vbtPxPerCm.toFixed(1)} px/cm — maintenant marque la barre`);
+}
+
+function vbtResetBar() {
+  vbtBarPos = null;
+  document.getElementById('vbt-bar-pos').textContent = 'Non défini';
+  vbtCalibStep = 3;
+  vbtDrawFrame();
+}
+
+async function vbtStartTracking() {
+  if (!vbtBarPos || !vbtPxPerCm || !vbtVideo) return;
+  document.getElementById('vbt-track-progress').classList.remove('hidden');
+  document.getElementById('vbt-track-btn').classList.add('btn-disabled');
+
+  vbtPositions = [];
+  const duration = vbtVideo.duration;
+  const totalFrames = Math.round(duration * vbtFPS);
+  let curY = vbtBarPos.y;
+  let curX = vbtBarPos.x;
+
+  // Process each frame
+  for (let f = 0; f < totalFrames; f++) {
+    vbtVideo.currentTime = f / vbtFPS;
+    await new Promise(r => { vbtVideo.onseeked = r; });
+    vbtCtx.drawImage(vbtVideo, 0, 0, vbtCanvas.width, vbtCanvas.height);
+    // Simplified tracking: scan column around curX, find best match Y
+    const newY = vbtTrackBarY(curX, curY, 60, 20);
+    curY = newY;
+    vbtPositions.push({y: newY, frame: f});
+    // Update progress
+    const pct = Math.round((f / totalFrames) * 100);
+    document.getElementById('vbt-prog-bar').style.width = pct + '%';
+    document.getElementById('vbt-prog-label').textContent = `Analyse: ${pct}% (frame ${f}/${totalFrames})`;
+  }
+
+  document.getElementById('vbt-track-progress').classList.add('hidden');
+  vbtCalcVelocity();
+}
+
+function vbtTrackBarY(cx, cy, searchRadius, patchH) {
+  // Sample brightness at current position
+  const imgData = vbtCtx.getImageData(Math.max(0, cx-10), Math.max(0, cy-patchH/2), 20, patchH);
+  // Search vertically
+  const minY = Math.max(patchH/2, cy - searchRadius);
+  const maxY = Math.min(vbtCanvas.height - patchH/2, cy + searchRadius);
+  let bestY = cy;
+  let bestDiff = Infinity;
+  for (let y = Math.round(minY); y <= Math.round(maxY); y += 2) {
+    const candidate = vbtCtx.getImageData(Math.max(0, cx-10), Math.max(0, y-patchH/2), 20, patchH);
+    let diff = 0;
+    for (let i = 0; i < imgData.data.length; i += 4) {
+      diff += Math.abs(imgData.data[i] - candidate.data[i]);
+    }
+    if (diff < bestDiff) { bestDiff = diff; bestY = y; }
+  }
+  return bestY;
+}
+
+function movingAvg(arr, w) {
+  return arr.map((v,i) => {
+    const start = Math.max(0, i - Math.floor(w/2));
+    const end = Math.min(arr.length-1, i + Math.floor(w/2));
+    const slice = arr.slice(start, end+1);
+    return slice.reduce((a,b)=>a+b,0) / slice.length;
+  });
+}
+
+function vbtCalcVelocity() {
+  if (vbtPositions.length < 3) { showToast('Pas assez de données'); return; }
+  const dt = 1 / vbtFPS;
+  const rawVel = [];
+  for (let i=1;i<vbtPositions.length;i++) {
+    const dy = (vbtPositions[i].y - vbtPositions[i-1].y); // px, positive=down
+    const velPxS = dy / dt;
+    const velMS = -velPxS / (vbtPxPerCm * 100); // negate: up=positive, convert to m/s
+    rawVel.push(velMS);
+  }
+  const smoothVel = movingAvg(rawVel, 5);
+
+  // Detect reps (concentric = positive velocity = bar going up)
+  const reps = detectVBTReps(smoothVel);
+
+  // Load / BW
+  const load = parseFloat(document.getElementById('vbt-load').value) || 0;
+  const bw = parseFloat(document.getElementById('vbt-bw').value) || 70;
+  const force = (bw + load) * 9.81;
+
+  // Display
+  const peakVel = Math.max(...smoothVel.map(Math.abs));
+  const peakPower = Math.round(force * peakVel);
+
+  // Chart
+  renderVBTChart(smoothVel, reps);
+
+  // Rep results
+  let repHTML = '';
+  let firstPeak = reps.length > 0 ? reps[0].peakVel : peakVel;
+  reps.forEach((r, i) => {
+    const loss = i > 0 ? Math.round((1 - r.peakVel / firstPeak) * 100) : 0;
+    const warn = loss > 20 ? ' ⚠️' : '';
+    const col = loss > 20 ? 'var(--red)' : loss > 10 ? 'var(--orange)' : 'var(--green)';
+    repHTML += `<div class="result-row">
+      <span style="font-weight:700">Rep ${i+1}</span>
+      <span>pic <strong>${r.peakVel.toFixed(2)} m/s</strong></span>
+      ${i>0?`<span style="color:${col}">-${loss}%${warn}</span>`:'<span style="color:var(--green)">référence</span>'}
+    </div>`;
+  });
+  document.getElementById('vbt-rep-results').innerHTML = `<div class="card-sm mb-12">${repHTML || '<span style="color:var(--gray)">Aucune rep détectée</span>'}</div>`;
+
+  const vLoss = reps.length > 1 ? Math.round((1 - reps[reps.length-1].peakVel / firstPeak) * 100) : 0;
+  document.getElementById('vbt-vloss').textContent = vLoss;
+  document.getElementById('vbt-power').textContent = peakPower;
+
+  const vli = document.getElementById('vbt-vloss-interp');
+  vli.classList.remove('hidden');
+  if (vLoss <= 10) { vli.className='interp-box interp-green'; vli.textContent='✅ Perte vitesse faible — continue la série'; }
+  else if (vLoss <= 20) { vli.className='interp-box interp-orange'; vli.textContent='⚠️ Perte de vitesse modérée — envisage de t\'arrêter'; }
+  else { vli.className='interp-box interp-red'; vli.textContent='❌ Perte vitesse > 20% — arrête la série (fatigue excessive)'; }
+
+  document.getElementById('vbt-results').classList.remove('hidden');
+}
+
+function detectVBTReps(vel) {
+  const reps = [];
+  let inRep = false;
+  let repMax = 0;
+  const threshold = 0.05;
+  for (let i=0;i<vel.length;i++) {
+    if (vel[i] > threshold) {
+      if (!inRep) { inRep=true; repMax=vel[i]; }
+      else if (vel[i] > repMax) repMax = vel[i];
+    } else {
+      if (inRep) { reps.push({peakVel:repMax}); inRep=false; repMax=0; }
+    }
+  }
+  if (inRep) reps.push({peakVel:repMax});
+  return reps;
+}
+
+function renderVBTChart(vel, reps) {
+  const ctx2 = document.getElementById('vbt-vel-chart').getContext('2d');
+  if (vbtVelChart) vbtVelChart.destroy();
+  const labels = vel.map((_,i)=>(i/vbtFPS).toFixed(2));
+  vbtVelChart = new Chart(ctx2, {
+    type:'line',
+    data:{
+      labels,
+      datasets:[{
+        label:'Vitesse (m/s)',
+        data:vel,
+        borderColor:'#7ED957',
+        backgroundColor:'rgba(126,217,87,0.08)',
+        borderWidth:2,
+        pointRadius:0,
+        tension:0.3,
+        fill:true
+      }]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{ticks:{color:'#9CA3AF',maxTicksLimit:8},grid:{color:'rgba(255,255,255,0.06)'}},
+        y:{ticks:{color:'#9CA3AF'},grid:{color:'rgba(255,255,255,0.06)'},title:{display:true,text:'m/s',color:'#9CA3AF'}}
+      }
+    }
+  });
+}
+
+function vbtSave() {
+  const data = JSON.parse(localStorage.getItem('outils_vbt') || '[]');
+  data.unshift({
+    load: document.getElementById('vbt-load').value,
+    fps: vbtFPS,
+    vloss: document.getElementById('vbt-vloss').textContent,
+    power: document.getElementById('vbt-power').textContent,
+    date: new Date().toISOString()
+  });
+  if (data.length > 20) data.length = 20;
+  localStorage.setItem('outils_vbt', JSON.stringify(data));
+  showToast('Session VBT enregistrée ✓');
+}
+
+// ═══════════════════════════════════════════════
+//  SPRINT
+// ═══════════════════════════════════════════════
+let sprintFPS = 60;
+let sprintVideo = null;
+let sprintCanvas = null;
+let sprintCtx = null;
+let sprintMode = 'video';
+let sprintSteps = []; // [{type:'contact'|'takeoff', frame, time}]
+let sprintStepsChart = null;
+let fvSplits = [];
+let fvChart = null;
+
+function setSprintMode(mode) {
+  sprintMode = mode;
+  document.querySelectorAll('#view-sprint .sub-tab').forEach((el,i) => {
+    el.classList.toggle('active', ['video','fv','brake'][i] === mode);
+  });
+  document.getElementById('sprint-video-mode').classList.toggle('hidden', mode !== 'video');
+  document.getElementById('sprint-fv-mode').classList.toggle('hidden', mode !== 'fv');
+  document.getElementById('sprint-brake-mode').classList.toggle('hidden', mode !== 'brake');
+}
+
+function setSprintFPS(fps) {
+  sprintFPS = fps;
+  document.querySelectorAll('#sprint-fps-btns .fps-opt').forEach(b => b.classList.toggle('active', b.textContent.includes(fps)));
+}
+
+function sprintLoadVideo(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  sprintVideo = document.getElementById('sprint-video');
+  sprintCanvas = document.getElementById('sprint-canvas');
+  sprintCtx = sprintCanvas.getContext('2d');
+  const url = URL.createObjectURL(file);
+  sprintVideo.src = url;
+  sprintVideo.load();
+  sprintVideo.onloadedmetadata = () => {
+    document.getElementById('sprint-video-loader').classList.add('hidden');
+    document.getElementById('sprint-fps-row').classList.remove('hidden');
+    document.getElementById('sprint-video-area').classList.remove('hidden');
+    sprintCanvas.width = sprintVideo.videoWidth || 640;
+    sprintCanvas.height = sprintVideo.videoHeight || 360;
+    sprintVideo.currentTime = 0;
+    sprintVideo.onseeked = sprintDrawFrame;
+    sprintDrawFrame();
+  };
+}
+
+function sprintDrawFrame() {
+  if (!sprintCtx || !sprintVideo) return;
+  sprintCtx.drawImage(sprintVideo, 0, 0, sprintCanvas.width, sprintCanvas.height);
+  const frame = Math.round(sprintVideo.currentTime * sprintFPS);
+  document.getElementById('sprint-frame-display').textContent = 'Frame ' + frame;
+}
+
+function sprintSeek(delta) {
+  if (!sprintVideo) return;
+  sprintVideo.currentTime = Math.max(0, sprintVideo.currentTime + delta / sprintFPS);
+  setTimeout(sprintDrawFrame, 50);
+}
+
+function sprintMarkContact() {
+  if (!sprintVideo) return;
+  const frame = Math.round(sprintVideo.currentTime * sprintFPS);
+  const time = sprintVideo.currentTime;
+  sprintSteps.push({type:'contact', frame, time});
+  renderSprintStepsList();
+  tryCalcSprintResults();
+}
+
+function sprintMarkTakeoff() {
+  if (!sprintVideo) return;
+  const frame = Math.round(sprintVideo.currentTime * sprintFPS);
+  const time = sprintVideo.currentTime;
+  sprintSteps.push({type:'takeoff', frame, time});
+  renderSprintStepsList();
+  tryCalcSprintResults();
+}
+
+function sprintUndoLast() {
+  sprintSteps.pop();
+  renderSprintStepsList();
+  if (sprintSteps.length < 2) document.getElementById('sprint-results').classList.add('hidden');
+}
+
+function renderSprintStepsList() {
+  const el = document.getElementById('sprint-steps-list');
+  if (!sprintSteps.length) { el.textContent = 'Aucun marqueur'; return; }
+  el.innerHTML = sprintSteps.slice(-6).map((s,i) => `
+    <span class="chip" style="margin-bottom:4px">
+      ${s.type==='contact'?'🦶':'🚀'} F${s.frame} (${s.time.toFixed(3)}s)
+    </span>
+  `).join('');
+}
+
+function tryCalcSprintResults() {
+  // Need at least: contact, takeoff, contact (2 pairs)
+  const contacts = sprintSteps.filter(s=>s.type==='contact');
+  const takeoffs = sprintSteps.filter(s=>s.type==='takeoff');
+  if (contacts.length < 2 || takeoffs.length < 1) return;
+
+  const steps = [];
+  for (let i=0; i<Math.min(contacts.length-1, takeoffs.length); i++) {
+    const tc = takeoffs[i].time - contacts[i].time;
+    const tf = contacts[i+1].time - takeoffs[i].time;
+    if (tc > 0 && tf > 0) steps.push({tc:tc*1000, tf:tf*1000});
+  }
+  if (!steps.length) return;
+
+  const tcAvg = steps.reduce((a,b)=>a+b.tc,0)/steps.length;
+  const tfAvg = steps.reduce((a,b)=>a+b.tf,0)/steps.length;
+  const freq = 1000/(tcAvg+tfAvg);
+  const rsi = tfAvg/tcAvg;
+
+  document.getElementById('sprint-tc-avg').textContent = Math.round(tcAvg);
+  document.getElementById('sprint-tf-avg').textContent = Math.round(tfAvg);
+  document.getElementById('sprint-freq').textContent = freq.toFixed(2);
+  document.getElementById('sprint-rsi').textContent = rsi.toFixed(2);
+
+  // Chart
+  const ctx2 = document.getElementById('sprint-steps-chart').getContext('2d');
+  if (sprintStepsChart) sprintStepsChart.destroy();
+  sprintStepsChart = new Chart(ctx2, {
+    type:'bar',
+    data:{
+      labels: steps.map((_,i)=>'F'+(i+1)),
+      datasets:[
+        {label:'Contact (ms)', data:steps.map(s=>s.tc.toFixed(0)), backgroundColor:'#FF575780'},
+        {label:'Vol (ms)', data:steps.map(s=>s.tf.toFixed(0)), backgroundColor:'#7ED95780'}
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{display:true,labels:{color:'#9CA3AF',font:{size:11}}}},
+      scales:{
+        x:{ticks:{color:'#9CA3AF'},grid:{color:'rgba(255,255,255,0.06)'}},
+        y:{ticks:{color:'#9CA3AF'},grid:{color:'rgba(255,255,255,0.06)'}}
+      }
+    }
+  });
+  document.getElementById('sprint-results').classList.remove('hidden');
+}
+
+function sprintSave() {
+  const data = JSON.parse(localStorage.getItem('outils_sprint') || '[]');
+  data.unshift({
+    type:'steps',
+    tc: document.getElementById('sprint-tc-avg').textContent,
+    tf: document.getElementById('sprint-tf-avg').textContent,
+    freq: document.getElementById('sprint-freq').textContent,
+    rsi: document.getElementById('sprint-rsi').textContent,
+    date: new Date().toISOString()
+  });
+  if (data.length > 20) data.length = 20;
+  localStorage.setItem('outils_sprint', JSON.stringify(data));
+  showToast('Sprint enregistré ✓');
+}
+
+// F-V PROFILE (Morin 2012 simplified)
+function renderFVSplits() {
+  const el = document.getElementById('fv-split-inputs');
+  el.innerHTML = fvSplits.map((s,i) => `
+    <div class="step-row">
+      <div class="step-num ${s.time ? 'done' : ''}">${i+1}</div>
+      <div style="flex:1;display:flex;gap:8px">
+        <input type="number" placeholder="Dist (m)" value="${s.dist||''}" oninput="fvSplits[${i}].dist=parseFloat(this.value)||0" style="flex:1">
+        <input type="number" placeholder="Temps (s)" step="0.01" value="${s.time||''}" oninput="fvSplits[${i}].time=parseFloat(this.value)||0" style="flex:1">
+      </div>
+    </div>
+  `).join('');
+}
+
+function fvAddSplit() {
+  const lastDist = fvSplits.length ? fvSplits[fvSplits.length-1].dist : 0;
+  fvSplits.push({dist: lastDist+10, time:''});
+  renderFVSplits();
+}
+
+function fvRemoveSplit() {
+  if (fvSplits.length > 2) { fvSplits.pop(); renderFVSplits(); }
+}
+
+function calcFVProfile() {
+  const mass = parseFloat(document.getElementById('fv-mass').value);
+  const height = parseFloat(document.getElementById('fv-height').value);
+  if (!mass || !height) { showToast('Entre la masse et la taille'); return; }
+
+  const valid = fvSplits.filter(s => s.dist > 0 && s.time > 0);
+  if (valid.length < 2) { showToast('Entre au moins 2 temps de passage'); return; }
+
+  // Calculate velocities at each split (Δd/Δt)
+  const points = valid.map((s,i) => {
+    if (i === 0) return { d:s.dist, t:s.time, v: s.dist/s.time };
+    const prevS = valid[i-1];
+    const v = (s.dist - prevS.dist) / (s.time - prevS.time);
+    return { d:s.dist, t:s.time, v };
+  });
+
+  // Fit exponential velocity model: v(t) = vMax * (1 - exp(-t/tau))
+  // Simplified linear regression on ln(1 - v/vMax) vs t
+  // Use vMax = max observed * 1.05
+  const vMax = Math.max(...points.map(p=>p.v)) * 1.05;
+  const tau = points.reduce((sum, p) => {
+    const ln = -Math.log(Math.max(0.001, 1 - p.v/vMax));
+    return sum + p.t / ln;
+  }, 0) / points.length;
+
+  // F0, V0, Pmax using Morin approach
+  // F_h ≈ mass × acceleration = mass × vMax/tau (at t→0, a = vMax/tau)
+  const F0 = (mass * vMax / tau) / mass; // N/kg relative
+  const V0 = vMax; // m/s
+  const Pmax = (F0 * V0) / 4; // W/kg (max power at F0/2, V0/2)
+  const DRF = (F0 / (mass * 9.81)) / V0 * -100; // slope of RF vs velocity (simplified)
+
+  document.getElementById('fv-f0').textContent = F0.toFixed(2);
+  document.getElementById('fv-v0').textContent = V0.toFixed(2);
+  document.getElementById('fv-pmax').textContent = Pmax.toFixed(1);
+  document.getElementById('fv-drf').textContent = Math.abs(DRF).toFixed(1);
+
+  // F-V chart
+  const fvCtx = document.getElementById('fv-chart').getContext('2d');
+  if (fvChart) fvChart.destroy();
+  const vPoints = Array.from({length:20}, (_,i) => i/19 * V0);
+  const fPoints = vPoints.map(v => Math.max(0, F0 * (1 - v/V0)));
+  fvChart = new Chart(fvCtx, {
+    type:'line',
+    data:{
+      labels: vPoints.map(v=>v.toFixed(1)),
+      datasets:[
+        {label:'Force (N/kg)',data:fPoints,borderColor:'#FF5757',backgroundColor:'rgba(255,87,87,0.08)',borderWidth:2,pointRadius:0,fill:true,tension:0.4},
+        {label:'Mesures',data:points.map(p=>({x:p.v.toFixed(1),y:(mass*p.v/tau/mass).toFixed(2)})),type:'scatter',borderColor:'#7ED957',backgroundColor:'#7ED957',pointRadius:5,showLine:false}
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{display:true,labels:{color:'#9CA3AF',font:{size:11}}}},
+      scales:{
+        x:{title:{display:true,text:'Vitesse (m/s)',color:'#9CA3AF'},ticks:{color:'#9CA3AF'},grid:{color:'rgba(255,255,255,0.06)'}},
+        y:{title:{display:true,text:'Force (N/kg)',color:'#9CA3AF'},ticks:{color:'#9CA3AF'},grid:{color:'rgba(255,255,255,0.06)'}}
+      }
+    }
+  });
+
+  const interp = document.getElementById('fv-interp');
+  interp.classList.remove('hidden');
+  if (V0 >= 9) { interp.className='interp-box interp-green'; interp.textContent='✅ Profil orienté vitesse — excellent V0'; }
+  else if (F0 >= 8) { interp.className='interp-box interp-orange'; interp.textContent='⚠️ Profil orienté force — travail de vitesse recommandé'; }
+  else { interp.className='interp-box interp-orange'; interp.textContent='ℹ️ Profil équilibré'; }
+
+  document.getElementById('fv-results').classList.remove('hidden');
+}
+
+function fvSave() {
+  const data = JSON.parse(localStorage.getItem('outils_sprint') || '[]');
+  data.unshift({
+    type:'fv',
+    f0: document.getElementById('fv-f0').textContent,
+    v0: document.getElementById('fv-v0').textContent,
+    pmax: document.getElementById('fv-pmax').textContent,
+    date: new Date().toISOString()
+  });
+  if (data.length > 20) data.length = 20;
+  localStorage.setItem('outils_sprint', JSON.stringify(data));
+  showToast('Profil F-V enregistré ✓');
+}
+
+// BRAKING TEST
+function calcBrake() {
+  const v0 = parseFloat(document.getElementById('brake-v0').value);
+  const dist = parseFloat(document.getElementById('brake-dist').value);
+  const mass = parseFloat(document.getElementById('brake-mass').value);
+  if (!v0 || !dist || !mass) { showToast('Remplis tous les champs'); return; }
+  const decel = (v0 * v0) / (2 * dist);
+  const force = decel; // in m/s² = N/kg
+  document.getElementById('brake-decel').textContent = decel.toFixed(2);
+  document.getElementById('brake-force').textContent = force.toFixed(2);
+  const interp = document.getElementById('brake-interp');
+  if (decel >= 6) { interp.className='interp-box interp-green'; interp.textContent='✅ Excellente capacité de freinage'; }
+  else if (decel >= 4) { interp.className='interp-box interp-orange'; interp.textContent='⚠️ Freinage moyen — renforcement excentrique recommandé'; }
+  else { interp.className='interp-box interp-red'; interp.textContent='❌ Capacité de freinage faible — risque blessure élevé'; }
+  document.getElementById('brake-results').classList.remove('hidden');
+}
+
+// ═══════════════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════════════
+let toastTimer = null;
+function showToast(msg, dur=2800) {
+  let t = document.getElementById('app-toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'app-toast';
+    t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 20px;border-radius:10px;font-size:14px;font-weight:600;z-index:999;border:1px solid #2A2A2A;max-width:90vw;text-align:center;opacity:0;transition:opacity .2s';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.style.opacity = '0'; }, dur);
+}
+</script>
+</body>
+</html>
