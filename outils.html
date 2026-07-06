@@ -129,7 +129,7 @@ h2{font-size:20px;font-weight:800;margin-bottom:8px}
 <div class="page">
   <div class="eyebrow">MOBILITÉ ARTICULAIRE</div>
   <h2>Inclinomètre Pro</h2>
-  <p class="subtext mb-16">Mesure de mobilité articulaire avec le gyroscope de ton téléphone. Capture à 60 Hz.</p>
+  <p class="subtext mb-16">Sélectionne le mouvement, pose le téléphone sur ta main ou le segment à mesurer, puis appuie sur Démarrer. L'angle est capturé à la fin du décompte de 5 secondes.</p>
 
   <!-- Movement selection -->
   <div class="card mb-12">
@@ -210,8 +210,6 @@ let inclSide = 'Droit';
 let inclCalibOffset = 0;
 let inclActive = false;
 let inclCountdownTimer = null;
-let inclMaxAngle = 0;
-let inclCaptureWindow = false;
 let inclCurrentAngle = 0;
 let inclSampleInterval = null; // 60 Hz sampling
 let lastResult = null; // pour WhatsApp
@@ -271,44 +269,36 @@ async function inclStart() {
   const ok = await requestMotionPerm();
   if (!ok) { showToast('Permission capteur refusée'); return; }
 
-  inclMaxAngle = 0;
-  inclCaptureWindow = false;
   inclActive = true;
   document.getElementById('incl-start-btn').classList.add('hidden');
   document.getElementById('incl-stop-btn').classList.remove('hidden');
   document.getElementById('incl-result-box').classList.add('hidden');
   document.getElementById('wa-share-btn').classList.add('hidden');
 
-  // Écoute deviceorientation
+  // Écoute deviceorientation à 60 Hz
   window.addEventListener('deviceorientation', onInclOrientation, true);
 
-  // Sampling 60 Hz — met à jour l'angle max régulièrement
-  inclSampleInterval = setInterval(() => {
-    if (inclCaptureWindow && inclCurrentAngle > inclMaxAngle) {
-      inclMaxAngle = inclCurrentAngle;
-    }
-  }, 1000 / 60);
-
-  // Décompte 5 secondes
+  // Décompte 5 secondes — capture l'angle courant à 0
   let count = 5;
   const cd = document.getElementById('incl-countdown-display');
+  const status = document.getElementById('incl-status');
   cd.style.display = 'flex';
   cd.textContent = count;
+  status.textContent = 'Pose le téléphone et maintiens la position…';
 
   inclCountdownTimer = setInterval(() => {
     count--;
     if (count > 0) {
       cd.textContent = count;
-      if (count <= 2) inclCaptureWindow = true;
     } else {
       clearInterval(inclCountdownTimer);
       cd.style.display = 'none';
+      // Capture l'angle à cet instant précis
+      const capturedAngle = inclCurrentAngle;
       inclStop();
-      showInclResult();
+      showInclResult(capturedAngle);
     }
   }, 1000);
-
-  document.getElementById('incl-status').textContent = 'Maintiens la position maximale…';
 }
 
 function inclStop() {
@@ -319,7 +309,6 @@ function inclStop() {
   document.getElementById('incl-stop-btn').classList.add('hidden');
   document.getElementById('incl-countdown-display').style.display = 'none';
   window.removeEventListener('deviceorientation', onInclOrientation, true);
-  if (inclMaxAngle > 0) showInclResult();
 }
 
 function onInclOrientation(e) {
@@ -330,10 +319,9 @@ function onInclOrientation(e) {
   document.getElementById('incl-live').style.color = getAngleColor(inclCurrentAngle, m.normal);
 }
 
-function showInclResult() {
+function showInclResult(angle) {
   const m = MOVEMENTS[inclSelectedIdx];
-  const angle = inclMaxAngle;
-  if (angle === 0) return;
+  if (!angle || angle === 0) return;
 
   const col = getAngleColor(angle, m.normal);
   const box = document.getElementById('incl-result-box');
